@@ -63,5 +63,8 @@ buck-out/
 /ios/Pods/
 /vendor/bundle/
 
+# VSCode
+.vscode/
+
 .env
 process.env
