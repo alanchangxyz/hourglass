@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -8,6 +8,8 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
+
+import { Backend } from '../util/utils';
 
 const styles = StyleSheet.create({
   sectionContainer: {
@@ -72,6 +74,15 @@ const Home = () => {
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+
+  useEffect(() => {
+    try {
+      const data = Backend.get('/users');
+      console.log(data);
+    } catch (e) {
+      console.log(e.message);
+    }
+  }, []);
 
   return (
     <SafeAreaView style={backgroundStyle}>

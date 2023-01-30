@@ -2645,6 +2645,32 @@
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.7.2.tgz#6c2324641cc4ba050a8c710b2b251b377581fbf0"
   integrity sha512-KufADq8uQqo1pYKVIYzfKbJfBAc0sOeXqGbFaSpv8MRmC/zXgowNZmFcbngndGk922QDmOASEXUZCaY48gs4cg==
 
+"@types/prop-types@*":
+  version "15.7.5"
+  resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.5.tgz#5f19d2b85a98e9558036f6a3cacc8819420f05cf"
+  integrity sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==
+
+"@types/react-native@0.71.1":
+  version "0.71.1"
+  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.71.1.tgz#215684a5117e2cc7a97425355e8962ad1a67cf0e"
+  integrity sha512-P9wTeYq7M3azvdHmubbIS85X3jiWvGhl4nqSDUAT47JRUJeM4EmoosSy1rKcDgq7fjUVIIDqVEk3qFdupOd0Nw==
+  dependencies:
+    "@types/react" "*"
+
+"@types/react@*", "@types/react@18.0.27":
+  version "18.0.27"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.27.tgz#d9425abe187a00f8a5ec182b010d4fd9da703b71"
+  integrity sha512-3vtRKHgVxu3Jp9t718R9BuzoD4NcQ8YJ5XRzsSKxNDiDonD2MXIT1TmSkenxuCycZJoQT5d2vE8LwWJxBC1gmA==
+  dependencies:
+    "@types/prop-types" "*"
+    "@types/scheduler" "*"
+    csstype "^3.0.2"
+
+"@types/scheduler@*":
+  version "0.16.2"
+  resolved "https://registry.yarnpkg.com/@types/scheduler/-/scheduler-0.16.2.tgz#1a62f89525723dde24ba1b01b092bf5df8ad4d39"
+  integrity sha512-hppQEBDmlwhFAXKJX2KnWLYu5yMfi91yazPb2l+lbJiwW+wdo1gNeRA+3RgNSO39WYX2euey41KEwnqesU2Jew==
+
 "@types/stack-utils@^2.0.0":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.1.tgz#20f18294f797f2209b5f65c8e3b5c8e8261d127c"
@@ -7139,6 +7165,14 @@ react-devtools-core@^4.26.1:
     shell-quote "^1.6.1"
     ws "^7"
 
+react-dom@18.2.0:
+  version "18.2.0"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-18.2.0.tgz#22aaf38708db2674ed9ada224ca4aa708d821e3d"
+  integrity sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==
+  dependencies:
+    loose-envify "^1.1.0"
+    scheduler "^0.23.0"
+
 react-freeze@^1.0.0:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/react-freeze/-/react-freeze-1.0.3.tgz#5e3ca90e682fed1d73a7cb50c2c7402b3e85618d"
@@ -7168,6 +7202,11 @@ react-native-codegen@^0.71.3:
     flow-parser "^0.185.0"
     jscodeshift "^0.13.1"
     nullthrows "^1.1.1"
+
+react-native-config@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/react-native-config/-/react-native-config-1.5.0.tgz#ff5a78fbbc2c2a0525788e5f3c86101110651ba4"
+  integrity sha512-slecooA/0tCwhb+RuWEbwLqtKirGh9vWPRpgDfH7uPAraCciqHNH2XjS9ylW+Spn4FUrHg5KWTqUGs9BdBADHg==
 
 react-native-gradle-plugin@^0.71.13:
   version "0.71.13"
