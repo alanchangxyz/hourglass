@@ -18,6 +18,7 @@ app.use(express.json());
 
 app.get('/', async (req, res) => {
   const dt = await db.query('SELECT NOW()');
+  res.send('Trying...');
   return res.status(200).send(`API running 🥳 from database: ${dt}`);
 });
 
