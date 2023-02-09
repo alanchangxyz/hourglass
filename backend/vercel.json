@@ -1,9 +1,9 @@
 {
     "version": 2,
-    "builds": {
+    "builds": [{
       "src": "backend/index.js",
       "use": "@now/node"
-    },
+    }],
     "routes": [
       {
         "src": "/backend/(.*)",
