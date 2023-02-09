@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+
+const { db } = require('./server/db');
 require('dotenv').config();
 
 const app = express();
@@ -14,11 +16,12 @@ app.use(
 
 app.use(express.json());
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
+  await db.query('SELECT NOW()');
   return res.status(200).send('API running 🥳');
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server listening on ${PORT}`);
 });
 
