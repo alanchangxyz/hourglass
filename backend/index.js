@@ -15,7 +15,7 @@ app.use(
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  return res.status(200).send('API running 🥳');
+  res.send('API running 🥳');
 });
 
 app.listen(PORT, () => {
