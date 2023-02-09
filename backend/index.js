@@ -17,8 +17,8 @@ app.use(
 app.use(express.json());
 
 app.get('/', async (req, res) => {
-  await db.query('SELECT NOW()');
-  return res.status(200).send('API running 🥳');
+  const dt = await db.query('SELECT NOW()');
+  return res.status(200).send(`API running 🥳 from database: ${dt}`);
 });
 
 app.listen(PORT, async () => {
