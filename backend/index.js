@@ -4,6 +4,10 @@ const cors = require('cors');
 const { db } = require('./server/db');
 require('dotenv').config();
 
+const recommendationsRouter = require('./routes/recommendations');
+const tasksRouter = require('./routes/tasks');
+const usersRouter = require('./routes/users');
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -21,6 +25,10 @@ app.get('/', async (req, res) => {
   console.log(dt[0].now);
   return res.status(200).send(`API running 🥳 from database: ${dt[0].now}`);
 });
+
+app.use('/recommendations', recommendationsRouter);
+app.use('/tasks', tasksRouter);
+app.use('/users', usersRouter);
 
 app.listen(PORT, async () => {
   console.log(`Server listening on ${PORT}`);
