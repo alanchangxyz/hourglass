@@ -5,8 +5,8 @@ import {
     StatusBar,
     StyleSheet,
     Text,
-    useColorScheme,
     View,
+    Button
 } from 'react-native';
 
 const styles = StyleSheet.create({
@@ -46,10 +46,16 @@ const TaskCard = props => {
     )
 }
 
-const Tasks = () => {
+const TasksView = ({navigation}) => {
     return (
         <SafeAreaView>
             <StatusBar />
+            <Button 
+                title="Add Task"
+                onPress={() =>
+                    navigation.navigate("Add a Task")
+                }
+            />
             <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.scrollArea}>
                 <TaskCard name="Hang out with Parsa" duration={12}/>
                 <TaskCard name="Your mom" duration={1}/>
@@ -58,4 +64,4 @@ const Tasks = () => {
     );
 };
 
-export default Tasks;
+export default TasksView;
