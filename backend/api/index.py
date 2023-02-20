@@ -1,7 +1,7 @@
 from flask import Flask, request
 from psycopg2.errors import UniqueViolation
-from db import query, connection, cursor
-import util
+from _util.db import query, connection, cursor
+import _util.util
 
 import os
 from dotenv import load_dotenv
