@@ -7,13 +7,13 @@ import {Text} from 'react-native';
 
 // Views
 import HomeView from './src/views/Home';
-import ScheduleView from './src/views/Schedule';
+import ScheduleTabNavigator from './src/navigators/ScheduleTab';
 import TasksView from './src/views/Tasks';
 import ProfileView from './src/views/Profile';
 
 //View names
 const home = "Home";
-const schedule = "Schedule";
+const schedule = "Schedule a Task";
 const tasks = "Tasks";
 const profile = "Profile";
 
@@ -44,7 +44,7 @@ function NavigationBar() {
         >
 
         <Tab.Screen name={home} component={HomeView} />
-        <Tab.Screen name={schedule} component={ScheduleView} />
+        <Tab.Screen name={schedule} component={ScheduleTabNavigator} options={{headerShown: false}}/>
         <Tab.Screen name={tasks} component={TasksView} />
         <Tab.Screen name={profile} component={ProfileView} />
 
