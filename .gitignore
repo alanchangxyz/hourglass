@@ -63,14 +63,20 @@ buck-out/
 /ios/Pods/
 /vendor/bundle/
 
-# Backend venv
+# Backend venv/vercel
+.vercel
+*.log
+*.pyc
+__pycache__
 .Python
 [Bb]in
+[Ee][Nn][Vv]
 [Ii]nclude
 [Ll]ib
 [Ll]ib64
 [Ll]ocal
 [Ss]cripts
+[Vv][Ee][Nn][Vv]
 pyvenv.cfg
 .venv
 pip-selfcheck.json
