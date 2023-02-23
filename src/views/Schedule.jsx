@@ -10,22 +10,25 @@ import {
   Button
 } from 'react-native';
 
-import { TaskCard } from '../utils/utils';
-
-// const styles = StyleSheet.create({});
+import { TaskCard, styles } from '../utils/utils';
 
 
 const ScheduleView = ({ navigation }) => {
-  const [selectedTask, setSelectedTask] = useState("");
+  const [selectedTask, setSelectedTask] = useState({name: "", duration: 0});
 
   return (
     <SafeAreaView>
       <StatusBar />
+      {/* TODO: next button should be fixed at bottom and scroll area should be above that*/}
       <Button
           title="Next"
           onPress={() =>
-            // navigation.navigate("Choose a Time Range")
-            console.log(selectedTask)
+            {
+              if (selectedTask.name !== "") {
+                navigation.navigate("Choose a Time Range", selectedTask)
+                console.log(selectedTask)
+              }
+            }
           }
         />
       <ScrollView contentInsetAdjustmentBehavior="automatic">

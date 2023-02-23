@@ -10,7 +10,7 @@ import {
     Pressable
 } from 'react-native';
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
     scrollArea: {
         height: '100%',
         backgroundColor:'#FFFFFF',
@@ -60,24 +60,21 @@ const styles = StyleSheet.create({
 
 
 export const TaskCard = props => {
-    const [userSelection, setUserSelection] = useState(false);
     const updateSelection = () => {
-        
-        if (props.selectedTask === props.name) {
-            props.setSelectedTask("")
+        if (props.selectedTask.name === props.name) {
+            props.setSelectedTask({name: "", duration: 0})
         } else {
-            props.setSelectedTask(props.name)
+            props.setSelectedTask({name: props.name, duration: props.duration})
         }
-        setUserSelection(!userSelection);
     };
 
     return (
         <Pressable onPress={updateSelection}>
 
         
-            <View style={(props.selectedTask === props.name)? styles.selectedCard : styles.card}>
-                <Text style={(props.selectedTask === props.name)? styles.selectedTaskName : styles.taskName}>{props.name}</Text>
-                <Text style={(props.selectedTask === props.name)? styles.selectedTaskDuration : styles.taskDuration}>{props.duration} {props.duration == 1 ? "minute" : "minutes"}</Text>
+            <View style={(props.selectedTask.name === props.name)? styles.selectedCard : styles.card}>
+                <Text style={(props.selectedTask.name === props.name)? styles.selectedTaskName : styles.taskName}>{props.name}</Text>
+                <Text style={(props.selectedTask.name === props.name)? styles.selectedTaskDuration : styles.taskDuration}>{props.duration} {props.duration == 1 ? "minute" : "minutes"}</Text>
             </View>
         </Pressable>
     )

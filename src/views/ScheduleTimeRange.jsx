@@ -13,6 +13,7 @@ import {
 // const styles = StyleSheet.create({});
 
 const ScheduleTimeRangeView = ({navigation, route}) => {
+    console.log(route.params)
     return (
         <SafeAreaView>
             <StatusBar />
