@@ -4,6 +4,7 @@ from psycopg2.extras import RealDictCursor
 
 import os
 from dotenv import load_dotenv
+load_dotenv()
 
 db_url = f"postgresql://{os.getenv('CDB_USER')}:{os.getenv('CDB_PASSWORD')}@{os.getenv('CDB_HOST')}:{os.getenv('CDB_PORT')}/{os.getenv('CDB_DB_NAME')}?sslmode=prefer"
 
