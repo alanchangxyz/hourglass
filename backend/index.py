@@ -135,7 +135,7 @@ def calendar_get_one(date):
 if __name__ == '__main__':
   if os.getenv('DEV_ENV') == 'production':
     from waitress import serve
-    serve(app, host='0.0.0.0', port=8080)
+    serve(app, host='0.0.0.0', port=os.getenv('FLASK_RUN_PORT'))
 
   else:
     app.run(host="localhost", port=os.getenv('FLASK_RUN_PORT'), debug=os.getenv('FLASK_RUN_DEBUG'), threaded=True)
