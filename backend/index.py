@@ -132,8 +132,10 @@ def calendar_get_one(date):
   end_date = (datetime.strptime(date,"%m-%d-%Y") + timedelta(days = 1)).isoformat() + 'Z'
   return request_events(start_date, end_date)
 
-# if os.getenv('DEV_ENV') == 'production':
-
-
 if __name__ == '__main__':
-  app.run(host="localhost", port=os.getenv('FLASK_RUN_PORT'), debug=os.getenv('FLASK_RUN_DEBUG'), threaded=True)
+  if os.getenv('DEV_ENV') == 'production':
+    from waitress import serve
+    serve(app, host='0.0.0.0', port=8080)
+
+  else:
+    app.run(host="localhost", port=os.getenv('FLASK_RUN_PORT'), debug=os.getenv('FLASK_RUN_DEBUG'), threaded=True)
