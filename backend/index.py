@@ -1,7 +1,7 @@
 from flask import Flask, request
 from psycopg2.errors import UniqueViolation
 from db import query, connection, cursor
-from gCal import credential_authorization, request_events
+from gcal import credential_authorization, request_events
 import util
 
 import os
@@ -132,5 +132,8 @@ def calendar_get_one(date):
   end_date = (datetime.strptime(date,"%m-%d-%Y") + timedelta(days = 1)).isoformat() + 'Z'
   return request_events(start_date, end_date)
 
+# if os.getenv('DEV_ENV') == 'production':
+
+
 if __name__ == '__main__':
-  app.run(host="localhost", port=os.getenv('FLASK_RUN_PORT'), debug=os.getenv('FLASK_RUN_DEBUG'))
+  app.run(host="localhost", port=os.getenv('FLASK_RUN_PORT'), debug=os.getenv('FLASK_RUN_DEBUG'), threaded=True)
