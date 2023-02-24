@@ -9,11 +9,14 @@ import {
     View,
     Button
 } from 'react-native';
+import DatePicker from 'react-native-date-picker';
 
 // const styles = StyleSheet.create({});
 
 const ScheduleTimeRangeView = ({navigation, route}) => {
     console.log(route.params)
+    const [timeRangeStart, setTimeRangeStart] = useState(new Date())
+
     return (
         <SafeAreaView>
             <StatusBar />
@@ -25,6 +28,8 @@ const ScheduleTimeRangeView = ({navigation, route}) => {
                     }
                 />
             </ScrollView>
+            
+            <DatePicker date={timeRangeStart} onDateChange={setTimeRangeStart} />
         </SafeAreaView>
     );
 };
