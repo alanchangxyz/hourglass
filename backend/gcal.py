@@ -26,7 +26,9 @@ def credential_authorization():
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 os.getenv('GCAL_CREDS'), SCOPES)
-            creds = flow.run_local_server(port=8001, success_message=SUCCESS_MESSAGE)
+            flow.redirect_uri = url_for('oauth2callback', _external=True)
+            authorization_url, state = flow.authorization_url(access_type='offline', include_granted_scopes='true')
+            return redirect(authorization_url)
         # Save the credentials for the next run
         with open(os.getenv('GCAL_TOKEN'), 'w') as token:
             token.write(creds.to_json())
