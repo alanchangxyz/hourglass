@@ -54,6 +54,23 @@ export const styles = StyleSheet.create({
         fontWeight: 400,
         fontSize: 12,
         color: 'white'
+    },
+    fieldTitle: {
+        fontWeight: 400,
+        fontSize: 14,
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+        color: 'black'
+    },
+    textInput: {
+        borderWidth: 1,
+        marginHorizontal: 20,
+        padding: 10
+    },
+    taskDurationFields: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingBottom: 30,
     }
 
   });
