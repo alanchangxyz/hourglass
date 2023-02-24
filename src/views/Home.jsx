@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableWithoutFeedback } from 'react-native';
 
 const styles = StyleSheet.create({
@@ -173,8 +173,16 @@ const DATA = [
 ];
 
 // Request to Google Calendar API for the date
-function getGoogleCalendarData(date) {
-  return DATA;
+async function getGoogleCalendarData(date) {
+  date = date.toLocaleDateString().replaceAll('/', '-');
+  try {
+    const response = await fetch(`https://hourglass.alanchang.xyz/api/calendar/${date}`);
+    const responseJson = await response.json();
+    return responseJson;
+  } catch (error) {
+    console.error(error);
+    return DATA;
+  }
 }
 
 // Request to database for tasks user scheduled for the date based on recommendations but marked as later
@@ -189,11 +197,11 @@ function mergeCalendarEvents(googleCalendarEvents, scheduledEvents) {
 }
 
 // Get google calendar and scheduled data and merge them into one list
-function getHomepageCalData(date) {
-  googleCalendarData = getGoogleCalendarData();
-  scheduledTaskData = getScheduledTaskData();
-  combinedEventData = mergeCalendarEvents(googleCalendarData, scheduledTaskData);
-  return combinedEventData;
+async function getHomepageCalData(date) {
+  googleCalendarData = await getGoogleCalendarData(date);
+  // scheduledTaskData = getScheduledTaskData();
+  // combinedEventData = mergeCalendarEvents(googleCalendarData, scheduledTaskData);
+  return googleCalendarData;
 }
 
 const Header = props => {
@@ -206,15 +214,15 @@ const Header = props => {
 };
 
 const DateCard = props => {
-  function onSelectDateCard() {
+  async function onSelectDateCard() {
     // Update the DateCard that is highlighted
     props.updateFocused();
 
     // Get the homepage data
-    homepageData = getHomepageCalData(props.date);
+    homepageData = await getHomepageCalData(props.date);
 
     // Set the data from the calendar
-    props.setCalendarData(props.dayNum % 2 == 0 ? homepageData : homepageData.reverse());
+    props.setCalendarData(homepageData);
   }
   return (
     <TouchableWithoutFeedback onPress={() => onSelectDateCard()}>
@@ -313,14 +321,31 @@ const RecommendationCard = props => {
 };
 
 const Home = () => {
-  const [calData, setCalData] = useState(getHomepageCalData(new Date()));
+  const [calData, setCalData] = useState();
+  useEffect(() => {
+    getHomepageCalData(new Date()).then(data => setCalData(data));
+  }, []);
 
-  const renderEventCard = ({ item }) =>
-    item.is_recommendation ? (
-      <RecommendationCard start_time={item.start_time} end_time={item.end_time} name={item.name} />
-    ) : (
-      <CalendarCard start_time={item.start_time} end_time={item.end_time} name={item.name} />
-    );
+  function getEventTime(dateTime) {
+    date = new Date(dateTime);
+    hours = Number(dateTime.substring(11, 13));
+    minutes = dateTime.substring(14, 16);
+    if (hours > 12) {
+      day_abbr = 'PM';
+      hours -= 12;
+    } else {
+      day_abbr = 'AM';
+    }
+    return hours + ':' + minutes + ' ' + day_abbr;
+  }
+
+  const renderEventCard = ({ item }) => (
+    <CalendarCard
+      start_time={getEventTime(item.start.dateTime)}
+      end_time={getEventTime(item.end.dateTime)}
+      name={item.summary}
+    />
+  );
 
   return (
     <View>
