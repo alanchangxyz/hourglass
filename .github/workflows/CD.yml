@@ -26,5 +26,5 @@ jobs:
             git pull origin master &&
             source bin/activate &&
             pip install -r requirements.txt &&
-            pm2 restart index.py --name
+            pm2 restart index.py --name hourglass-flask
           '
