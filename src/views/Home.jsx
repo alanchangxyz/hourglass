@@ -2,6 +2,14 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableWithoutFeedback } from 'react-native';
 
 const styles = StyleSheet.create({
+  headerName: {
+    fontSize: 36,
+    color: 'black',
+    lineHeight: 44,
+  },
+  eventList: {
+    height: '70%',
+  },
   calCard: {
     width: '80%',
     height: 72,
@@ -188,6 +196,15 @@ function getHomepageCalData(date) {
   return combinedEventData;
 }
 
+const Header = props => {
+  return (
+    <View>
+      <Text style={styles.headerName}>Hello {props.name},</Text>
+      <Text>Check out your daily schedules:</Text>
+    </View>
+  );
+};
+
 const DateCard = props => {
   function onSelectDateCard() {
     // Update the DateCard that is highlighted
@@ -307,8 +324,14 @@ const Home = () => {
 
   return (
     <View>
+      <Header name={'Alan'} />
       <DateList setCalendarData={setCalData} />
-      <FlatList data={calData} renderItem={renderEventCard} keyExtractor={item => item.id} />
+      <FlatList
+        style={styles.eventList}
+        data={calData}
+        renderItem={renderEventCard}
+        keyExtractor={item => item.id}
+      />
     </View>
   );
 };
