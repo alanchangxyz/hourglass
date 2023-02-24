@@ -1,14 +1,19 @@
 from flask import Flask, request
 from psycopg2.errors import UniqueViolation
 from db import query, connection, cursor
-from gcal import credential_authorization, request_events
+from gcal import credential_authorization, save_credentials, request_events
+
 import util
 
 import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-
 load_dotenv()
+
+SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+SUCCESS_MESSAGE = "Hourglass has successfully connected to your Google Calendar"
+
+
 app = Flask(os.getenv('FLASK_APP_NAME'))
 
 
@@ -124,6 +129,10 @@ def users_delete_one(id):
 @app.route('/authorize', methods=['GET'])
 def google_authorization():
   return credential_authorization()
+
+@app.route('/finishAuth')
+def finishAuth():
+  return save_credentials()
 
 # Google Calendar Credential Authorization
 @app.route('/calendar/<date>', methods=['GET'])

@@ -1,5 +1,6 @@
 import os.path, os
 from dotenv import load_dotenv
+from flask import url_for, redirect, request
 load_dotenv()
 
 from google.auth.transport.requests import Request
@@ -7,6 +8,8 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+
+import util
 
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 SUCCESS_MESSAGE = "Hourglass has successfully connected to your Google Calendar"
@@ -26,12 +29,21 @@ def credential_authorization():
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 os.getenv('GCAL_CREDS'), SCOPES)
-            flow.redirect_uri = url_for('oauth2callback', _external=True)
+            flow.redirect_uri = url_for('finishAuth', _external=True)
             authorization_url, state = flow.authorization_url(access_type='offline', include_granted_scopes='true')
             return redirect(authorization_url)
-        # Save the credentials for the next run
-        with open(os.getenv('GCAL_TOKEN'), 'w') as token:
-            token.write(creds.to_json())
+
+def save_credentials():
+  # Save the credentials for the next run
+  flow = InstalledAppFlow.from_client_secrets_file(os.getenv('GCAL_CREDS'), SCOPES)
+  flow.redirect_uri = url_for('finishAuth', _external=True)
+  authorization_response = request.url
+  # Use authorisation code to request credentials from Google
+  flow.fetch_token(authorization_response=authorization_response)
+  credentials = flow.credentials
+  with open(os.getenv('GCAL_TOKEN'), 'w') as token:
+    token.write(credentials.to_json())
+  return util.status200({'status': 'Success!'})
 
 def request_events(start_time, end_time):
     creds = None
