@@ -29,14 +29,19 @@ def credential_authorization():
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 os.getenv('GCAL_CREDS'), SCOPES)
-            flow.redirect_uri = url_for('finishAuth', _external=True)
+            # flow.redirect_uri = url_for('finishAuth', _external=True)
+            rdLink = url_for('finishAuth', _external=True)
+            flow.redirect_uri = os.getenv('API_URL') + '/' + rdLink[rdLink.find('finishAuth'):]
             authorization_url, state = flow.authorization_url(access_type='offline', include_granted_scopes='true')
             return redirect(authorization_url)
 
 def save_credentials():
   # Save the credentials for the next run
   flow = InstalledAppFlow.from_client_secrets_file(os.getenv('GCAL_CREDS'), SCOPES)
-  flow.redirect_uri = url_for('finishAuth', _external=True)
+  # flow.redirect_uri = url_for('finishAuth', _external=True)
+  rdLink = url_for('finishAuth', _external=True)
+  flow.redirect_uri = os.getenv('API_URL') + '/' + rdLink[rdLink.find('finishAuth'):]
+
   authorization_response = request.url
   # Use authorisation code to request credentials from Google
   flow.fetch_token(authorization_response=authorization_response)
