@@ -26,7 +26,7 @@ def credential_authorization():
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 os.getenv('GCAL_CREDS'), SCOPES)
-            creds = flow.run_local_server(port=0, success_message=SUCCESS_MESSAGE)
+            creds = flow.run_local_server(port=8001, success_message=SUCCESS_MESSAGE)
         # Save the credentials for the next run
         with open(os.getenv('GCAL_TOKEN'), 'w') as token:
             token.write(creds.to_json())
