@@ -36,9 +36,7 @@ def credential_authorization():
             return redirect(authorization_url)
 
 def save_credentials():
-  # Save the credentials for the next run
   flow = InstalledAppFlow.from_client_secrets_file(os.getenv('GCAL_CREDS'), SCOPES)
-  # flow.redirect_uri = url_for('finishAuth', _external=True)
   rdLink = url_for('finishAuth', _external=True)
   flow.redirect_uri = os.getenv('API_URL') + '/' + rdLink[rdLink.find('finishAuth'):]
 

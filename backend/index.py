@@ -1,5 +1,6 @@
 from flask import Flask, request
 from psycopg2.errors import UniqueViolation
+import pytz
 from db import query, connection, cursor
 from gcal import credential_authorization, save_credentials, request_events
 
@@ -134,12 +135,15 @@ def google_authorization():
 def finishAuth():
   return save_credentials()
 
-# Google Calendar Credential Authorization
+# Google Calendar Get Events at Date
 @app.route('/calendar/<date>', methods=['GET'])
 def calendar_get_one(date):
-  start_date = datetime.strptime(date,"%m-%d-%Y").isoformat() + 'Z'
-  end_date = (datetime.strptime(date,"%m-%d-%Y") + timedelta(days = 1)).isoformat() + 'Z'
-  return request_events(start_date, end_date)
+  start_date_pst = datetime.strptime(f"{date} 00:00:00","%m-%d-%Y %H:%M:%S")
+  end_date_pst = datetime.strptime(f"{date} 00:00:00","%m-%d-%Y %H:%M:%S")+ timedelta(days = 1)
+  pst_time = pytz.timezone("America/Los_Angeles")
+  start_date_utc = pst_time.localize(start_date_pst, is_dst=None).astimezone(pytz.utc).isoformat().replace("+00:00", "Z")
+  end_date_utc = pst_time.localize(end_date_pst, is_dst=None).astimezone(pytz.utc).isoformat().replace("+00:00", "Z")
+  return request_events(start_date_utc, end_date_utc)
 
 if __name__ == '__main__':
   if os.getenv('DEV_ENV') == 'production':
