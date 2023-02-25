@@ -34,7 +34,7 @@ const ScheduleView = ({ navigation }) => {
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         {/* TODO: pull tasks from DB  */}
         <TaskCard name="Hang out with Parsa" duration={12} selectedTask={selectedTask} setSelectedTask={setSelectedTask}/>
-        <TaskCard name="Your mom" duration={1} selectedTask={selectedTask} setSelectedTask={setSelectedTask}/>
+        <TaskCard name="Coffee chat" duration={30} selectedTask={selectedTask} setSelectedTask={setSelectedTask}/>
       </ScrollView>
       
     </SafeAreaView>
