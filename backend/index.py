@@ -66,7 +66,18 @@ def recs_get_all_by_user_and_task(uid, tid):
   except:
     return util.error500("Internal server error")
 
-# NEED A POST ROUTE HERE
+@app.route('/recommendations', methods=['POST'])
+def recommendations_create_one():
+  js = request.get_json() #start_time, #end_time, min_offset, chosen, added_to_cal, uid, tid
+
+  try:
+    cursor.execute(f'INSERT INTO recommenations\
+      (start_time, end_time, min_offset, chosen, added_to_cal, uid, tid)\
+      VALUES (%s, %s, %d, %d, %s, %s) RETURNING *', (js['start_time'], js['end_time'], js['min_offset'], js['chosen'], js['added_to_cal'], js['uid'], js['tid']))
+    connection.commit()
+    return util.status200(cursor.fetchone())
+  except:
+    return util.error500("Internal server error")
 
 @app.route('/recommendations/<rid>', methods=['PUT'])
 def recommendations_edit_one(rid):
@@ -155,7 +166,17 @@ def tasks_get_all_by_user_and_task(uid):
   except:
     return util.error500("Internal server error")
 
-# NEED A POST ROUTE HERE
+@app.route('/tasks', methods=['POST'])
+def tasks_create_one():
+  js = request.get_json() #uid, name, priority, duration, start_range, end_range
+
+  try:
+    cursor.execute(f'INSERT INTO tasks (uid, name, priority, duration, start_range, end_range)\
+      VALUES (%s, %s, %d, %d, %s, %s) RETURNING *', (js['uid'], js['name'], js['priority'], js['duration'], js['start_range'], js['end_range']))
+    connection.commit()
+    return util.status200(cursor.fetchone())
+  except:
+    return util.error500("Internal server error")
 
 @app.route('/tasks/<tid>', methods=['PUT'])
 def tasks_edit_one(tid):
@@ -169,7 +190,7 @@ def tasks_edit_one(tid):
 
   try:
     cursor.execute(f'UPDATE tasks\
-      SET name = %s, priority = %s, duration = %s, start_range = %s, end_range = %s WHERE tid = %s',\
+      SET name = %s, priority = %s, duration = %d, start_range = %s, end_range = %s WHERE tid = %s',\
       (js['name'], js['priority'], js['duration'], js['start_range'], js['end_range'], tid)
     )
     connection.commit()
@@ -211,8 +232,8 @@ def users_get_all():
   except:
     return util.error500("Internal server error")
 
-@app.route('/users/<uid>', methods=['GET'])
-def users_get_one(uid):
+@app.route('/users/by-id/<uid>', methods=['GET'])
+def users_get_one_by_id(uid):
   try:
     uid = int(uid)
   except:
@@ -229,21 +250,27 @@ def users_get_one(uid):
   except:
     return util.error500("Internal server error")
 
+@app.route('/users/by-email/<email>', methods=['GET'])
+def users_get_one_by_email(email):
+  try:
+    cursor.execute(f'SELECT * from users WHERE email = %s', (email,))
+    res = cursor.fetchone()
+    if not res:
+      return util.status200(None)
+    return util.status200(res)
+  except:
+    return util.error500("Internal server error")
+
 @app.route('/users', methods=['POST'])
 def users_create_one():
-  js = request.get_json()
-  if util.doesNotContain(js, ['id']) or not isinstance(js['id'], int):
-    return util.error400('Invalid user ID supplied')
+  js = request.get_json() # email, fname, lname
   if util.doesNotContain(js, ['fname', 'lname']) or not isinstance(js['fname'], str) or not isinstance(js['lname'], str):
     return util.error400('Invalid user name supplied')
 
   try:
-    cursor.execute(f'INSERT INTO users (id, fname, lname) VALUES (%s, %s, %s)', (js['id'], js['fname'], js['lname']))
+    cursor.execute(f'INSERT INTO users (email, fname, lname) VALUES (%s, %s, %s) RETURNING *', (js['email'], js['fname'], js['lname']))
     connection.commit()
-    cursor.execute(f'SELECT * from users WHERE id = %s', (js['id'],))
     return util.status200(cursor.fetchone())
-  except UniqueViolation:
-    return util.error400(f"User ID {js['id']} already exists")
   except:
     return util.error500("Internal server error")
 
