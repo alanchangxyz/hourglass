@@ -16,24 +16,14 @@ SUCCESS_MESSAGE = "Hourglass has successfully connected to your Google Calendar"
 
 
 def credential_authorization():
-    creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists(os.getenv('GCAL_TOKEN')):
-        creds = Credentials.from_authorized_user_file(os.getenv('GCAL_TOKEN'), SCOPES)
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                os.getenv('GCAL_CREDS'), SCOPES)
-            # flow.redirect_uri = url_for('finishAuth', _external=True)
-            rdLink = url_for('finishAuth', _external=True)
-            flow.redirect_uri = os.getenv('API_URL') + '/' + rdLink[rdLink.find('finishAuth'):]
-            authorization_url, state = flow.authorization_url(access_type='offline', include_granted_scopes='true')
-            return redirect(authorization_url)
+    # The file token.json stores the token for gcal
+    flow = InstalledAppFlow.from_client_secrets_file(
+        os.getenv('GCAL_CREDS'), SCOPES)
+    # flow.redirect_uri = url_for('finishAuth', _external=True)
+    rdLink = url_for('finishAuth', _external=True)
+    flow.redirect_uri = os.getenv('API_URL') + '/' + rdLink[rdLink.find('finishAuth'):]
+    authorization_url, _ = flow.authorization_url(access_type='offline', include_granted_scopes='true')
+    return redirect(authorization_url)
 
 def save_credentials():
   flow = InstalledAppFlow.from_client_secrets_file(os.getenv('GCAL_CREDS'), SCOPES)
