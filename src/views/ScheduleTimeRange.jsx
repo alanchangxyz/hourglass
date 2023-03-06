@@ -25,14 +25,16 @@ const ScheduleTimeRangeView = ({navigation, route}) => {
             <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.scrollArea}>
                 <Text style={styles.fieldTitle}>When would you like this task to be scheduled? </Text>
                 <Text>As early as:</Text>
-                <DatePicker date={timeRangeStart} onDateChange={setTimeRangeStart} />
+                <DatePicker date={timeRangeStart} onDateChange={setTimeRangeStart} mode="time" />
                 <Text>As late as: </Text>
-                <DatePicker date={timeRangeEnd} onDateChange={setTimeRangeEnd} />
+                <DatePicker date={timeRangeEnd} onDateChange={setTimeRangeEnd} mode="time" />
 
                 <Button
                     title="Next"
                     onPress={() =>
-                        navigation.navigate("Choose a Time Slot", {taskName: name, taskDuration: duration, timeRangeStart: JSON.stringify(timeRangeStart), timeRangeEnd: JSON.stringify(timeRangeEnd)})
+                        navigation.navigate("Choose a Time Slot", {taskName: name, taskDuration: duration, 
+                            timeRangeStart: timeRangeStart.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}), 
+                            timeRangeEnd: timeRangeEnd.toLocaleString("en-US", {timeZone: "America/Los_Angeles"})})
                     }
                 />
                 

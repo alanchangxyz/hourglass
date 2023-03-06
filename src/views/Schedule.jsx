@@ -16,6 +16,8 @@ import { TaskCard, styles } from '../utils/utils';
 const ScheduleView = ({ navigation }) => {
   const [selectedTask, setSelectedTask] = useState({name: "", duration: 0});
 
+  // TODO: pull tasks from backend and then display all task cards
+
   return (
     <SafeAreaView>
       <StatusBar />

@@ -6,6 +6,7 @@ import ScheduleView from "../views/Schedule";
 import ScheduleTimeRangeView from "../views/ScheduleTimeRange";
 import SchedulePickTimeSlotView from "../views/SchedulePickTimeSlot";
 import ScheduleConfirmView from "../views/ScheduleConfirm";
+import Home from "../views/Home";
 
 const Stack = createNativeStackNavigator();
 
@@ -13,6 +14,7 @@ const schedule = "Choose a Task to Schedule";
 const timeRange = "Choose a Time Range";
 const pickSlot = "Choose a Time Slot";
 const confirm = "Your Task Has Been Scheduled";
+const home = "Home";
 
 const ScheduleTabNavigator = () => {
     return (
@@ -21,6 +23,7 @@ const ScheduleTabNavigator = () => {
             <Stack.Screen name={timeRange} component={ScheduleTimeRangeView}/>
             <Stack.Screen name={pickSlot} component={SchedulePickTimeSlotView}/>
             <Stack.Screen name={confirm} component={ScheduleConfirmView}/>
+            <Stack.Screen name={home} component={Home}/>
         </Stack.Navigator>
     )
 }
