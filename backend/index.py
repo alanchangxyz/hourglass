@@ -29,12 +29,177 @@ def recs_get_all():
   cursor.execute('SELECT * from recommendations')
   return cursor.fetchall()
 
+@app.route('/recommendations/<rid>', methods=['GET'])
+def recs_get_one_by_id(rid):
+  try:
+    rid = int(rid)
+  except:
+    return util.error400('Invalid recommendation ID supplied')
+  if not rid or not isinstance(rid, int):
+    return util.error400('Invalid recommendation ID supplied')
+
+  try:
+    cursor.execute(f'SELECT * from recommendations WHERE rid = %s ORDER BY recommendations.rid', (rid,))
+    res = cursor.fetchone()
+    if not res:
+      return util.status200(None)
+    return util.status200(res)
+  except:
+    return util.error500("Internal server error")
+
+@app.route('/recommendations/<uid>/<tid>', methods=['GET'])
+def recs_get_all_by_user_and_task(uid, tid):
+  try:
+    uid = int(uid)
+    tid = int(tid)
+  except:
+    return util.error400('Invalid user or task ID supplied')
+  if not uid or not tid or not isinstance(uid, int) or not isinstance(tid, int):
+    return util.error400('Invalid user or task ID supplied')
+
+  try:
+    cursor.execute(f'SELECT * from recommendations WHERE uid = %s AND tid = %s', (uid, tid))
+    res = cursor.fetchone()
+    if not res:
+      return util.status200(None)
+    return util.status200(res)
+  except:
+    return util.error500("Internal server error")
+
+# NEED A POST ROUTE HERE
+
+@app.route('/recommendations/<rid>', methods=['PUT'])
+def recommendations_edit_one(rid):
+  try:
+    rid = int(rid)
+  except:
+    return util.error400('Invalid user ID supplied')
+  if not rid or not isinstance(rid, int):
+    return util.error400('Invalid user ID supplied')
+  js = request.get_json() #start_time, #end_time, min_offset, chosen, added_to_cal, uid, tid
+
+  try:
+    cursor.execute(f'UPDATE recommendations\
+      SET start_time = %s, end_time = %s, min_offset = %d, chosen = %s, added_to_cal = %s, uid = %s, tid = %s WHERE rid = %s',\
+      (js['start_time'], js['end_time'], js['min_offset'], js['chosen'], js['added_to_cal'], js['uid'], js['tid'], rid)
+    )
+    connection.commit()
+    cursor.execute(f'SELECT * from recommendations WHERE rid = %s', (rid,))
+    res = cursor.fetchone()
+    if not res:
+      return util.status200(None)
+    return util.status200(res)
+  except:
+    return util.error500("Internal server error")
+
+@app.route('/recommendations/<rid>', methods=['DELETE'])
+def recommendations_delete_one(rid):
+  try:
+    rid = int(rid)
+  except:
+    return util.error400('Invalid recommendation ID supplied')
+  if not rid or not isinstance(rid, int):
+    return util.error400('Invalid recommendation ID supplied')
+
+  try:
+    cursor.execute(f'SELECT * from recommendations WHERE rid = %s', (rid,))
+    res = cursor.fetchone()
+    if not res:
+      return util.status200({'deleted': None})
+    cursor.execute(f'DELETE from recommendations WHERE rid = %s', (rid,))
+    connection.commit()
+    return util.status200({'deleted': rid})
+  except:
+    return util.error500("Internal server error")
+
 
 # Tasks routes
 @app.route('/tasks', methods=['GET'])
 def tasks_get_all():
   cursor.execute('SELECT * from tasks')
   return cursor.fetchall()
+
+@app.route('/tasks/<tid>', methods=['GET'])
+def tasks_get_one_by_id(tid):
+  try:
+    tid = int(tid)
+  except:
+    return util.error400('Invalid task ID supplied')
+  if not tid or not isinstance(tid, int):
+    return util.error400('Invalid task ID supplied')
+
+  try:
+    cursor.execute(f'SELECT * from tasks WHERE tid = %s ORDER BY tasks.tid', (tid,))
+    res = cursor.fetchone()
+    if not res:
+      return util.status200(None)
+    return util.status200(res)
+  except:
+    return util.error500("Internal server error")
+
+@app.route('/tasks/<uid>', methods=['GET'])
+def tasks_get_all_by_user_and_task(uid):
+  try:
+    uid = int(uid)
+  except:
+    return util.error400('Invalid user ID supplied')
+  if not uid or not isinstance(uid, int):
+    return util.error400('Invalid user ID supplied')
+
+  try:
+    cursor.execute(f'SELECT * from recommendations WHERE uid = %s', (uid,))
+    res = cursor.fetchall()
+    if not res:
+      return util.status200(None)
+    return util.status200(res)
+  except:
+    return util.error500("Internal server error")
+
+# NEED A POST ROUTE HERE
+
+@app.route('/tasks/<tid>', methods=['PUT'])
+def tasks_edit_one(tid):
+  try:
+    tid = int(tid)
+  except:
+    return util.error400('Invalid task ID supplied')
+  if not tid or not isinstance(tid, int):
+    return util.error400('Invalid task ID supplied')
+  js = request.get_json() #uid, name, priority, duration, start_range, end_range
+
+  try:
+    cursor.execute(f'UPDATE tasks\
+      SET name = %s, priority = %s, duration = %s, start_range = %s, end_range = %s WHERE tid = %s',\
+      (js['name'], js['priority'], js['duration'], js['start_range'], js['end_range'], tid)
+    )
+    connection.commit()
+    cursor.execute(f'SELECT * from tasks WHERE tid = %s', (tid,))
+    res = cursor.fetchone()
+    if not res:
+      return util.status200(None)
+    return util.status200(res)
+  except:
+    return util.error500("Internal server error")
+
+@app.route('/tasks/<tid>', methods=['DELETE'])
+def tasks_delete_one(tid):
+  try:
+    tid = int(tid)
+  except:
+    return util.error400('Invalid task ID supplied')
+  if not tid or not isinstance(tid, int):
+    return util.error400('Invalid task ID supplied')
+
+  try:
+    cursor.execute(f'SELECT * from tasks WHERE tid = %s', (tid,))
+    res = cursor.fetchone()
+    if not res:
+      return util.status200({'deleted': None})
+    cursor.execute(f'DELETE from tasks WHERE tid = %s', (tid,))
+    connection.commit()
+    return util.status200({'deleted': tid})
+  except:
+    return util.error500("Internal server error")
 
 
 # Users routes
@@ -46,17 +211,17 @@ def users_get_all():
   except:
     return util.error500("Internal server error")
 
-@app.route('/users/<id>', methods=['GET'])
-def users_get_one(id):
+@app.route('/users/<uid>', methods=['GET'])
+def users_get_one(uid):
   try:
-    id = int(id)
+    uid = int(uid)
   except:
     return util.error400('Invalid user ID supplied')
-  if not id or not isinstance(id, int):
+  if not uid or not isinstance(uid, int):
     return util.error400('Invalid user ID supplied')
 
   try:
-    cursor.execute(f'SELECT * from users WHERE id = %s', (id,))
+    cursor.execute(f'SELECT * from users WHERE id = %s', (uid,))
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
@@ -82,10 +247,10 @@ def users_create_one():
   except:
     return util.error500("Internal server error")
 
-@app.route('/users/<id>', methods=['PUT'])
-def users_edit_one(id):
+@app.route('/users/<uid>', methods=['PUT'])
+def users_edit_one(uid):
   try:
-    uid = int(id)
+    uid = int(uid)
   except:
     return util.error400('Invalid user ID supplied')
   if not uid or not isinstance(uid, int):
@@ -105,23 +270,23 @@ def users_edit_one(id):
   except:
     return util.error500("Internal server error")
 
-@app.route('/users/<id>', methods=['DELETE'])
-def users_delete_one(id):
+@app.route('/users/<uid>', methods=['DELETE'])
+def users_delete_one(uid):
   try:
-    id = int(id)
+    uid = int(uid)
   except:
     return util.error400('Invalid user ID supplied')
-  if not id or not isinstance(id, int):
+  if not uid or not isinstance(uid, int):
     return util.error400('Invalid user ID supplied')
 
   try:
-    cursor.execute(f'SELECT * from users WHERE id = %s', (id,))
+    cursor.execute(f'SELECT * from users WHERE id = %s', (uid,))
     res = cursor.fetchone()
     if not res:
       return util.status200({'deleted': None})
-    cursor.execute(f'DELETE from users WHERE id = %s', (id,))
+    cursor.execute(f'DELETE from users WHERE id = %s', (uid,))
     connection.commit()
-    return util.status200({'deleted': id})
+    return util.status200({'deleted': uid})
   except:
     return util.error500("Internal server error")
 
