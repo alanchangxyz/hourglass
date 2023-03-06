@@ -144,6 +144,10 @@ def tasks_get_one_by_id(tid):
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+
+    res['start_range'] = res['start_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    res['end_range'] = res['end_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -158,10 +162,15 @@ def tasks_get_all_by_user(uid):
     return util.error400('Invalid user ID supplied')
 
   try:
-    cursor.execute(f'SELECT * from recommendations WHERE uid = %s', (uid,))
+    cursor.execute(f'SELECT * from tasks WHERE uid = %s', (uid,))
     res = cursor.fetchall()
     if not res:
       return util.status200(None)
+
+    for task in res:
+      task['start_range'] = task['start_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+      task['end_range'] = task['end_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+
     return util.status200(res)
   except:
     return util.error500("Internal server error")
