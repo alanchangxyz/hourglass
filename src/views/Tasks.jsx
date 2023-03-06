@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     SafeAreaView,
     ScrollView,
+    FlatList,
     StatusBar,
     StyleSheet,
     Text,
@@ -10,13 +11,13 @@ import {
 } from 'react-native';
 
 const styles = StyleSheet.create({
-    scrollArea: {
+    taskList: {
         height: '100%',
         backgroundColor:'#FFFFFF',
         alignItems: 'center',
         paddingVertical: 15
     },
-    card: {
+    taskCard: {
         width: '90%',
         height: 72,
         backgroundColor: '#E6E6E6',
@@ -37,9 +38,21 @@ const styles = StyleSheet.create({
     }
   });
 
+  async function getTaskData() {
+    try {
+      const response = await fetch(`https://hourglass.alanchang.xyz/api/tasks`);
+      const responseJson = await response.json();
+      console.log(responseJson);
+      return responseJson;
+    } catch (error) {
+      console.error(error);
+      // return DATA;
+    }
+  };
+
 const TaskCard = props => {
     return (
-        <View style={styles.card}>
+        <View style={styles.taskCard}>
             <Text style={styles.taskName}>{props.name}</Text>
             <Text style={styles.taskDuration}>{props.duration} {props.duration == 1 ? "minute" : "minutes"}</Text>
         </View>
@@ -47,19 +60,35 @@ const TaskCard = props => {
 }
 
 const TasksView = ({navigation}) => {
+  const [taskData, setTaskData] = useState();
+  useEffect(() => {
+    getTaskData().then(data => setTaskData(data));
+  }, []);
+
+  const renderTaskCard = ({ item }) => {
+    console.log(item);
+    return (
+      <TaskCard
+        name={item.name}
+        duration={item.duration}
+      />
+    )
+    };
+
     return (
         <SafeAreaView>
             <StatusBar />
-            <Button 
+            <Button
                 title="Add Task"
                 onPress={() =>
                     navigation.navigate("Add a Task")
                 }
             />
-            <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.scrollArea}>
-                <TaskCard name="Hang out with Parsa" duration={12}/>
-                <TaskCard name="Your mom" duration={1}/>
-            </ScrollView>
+            <FlatList
+              contentContainerStyle={styles.taskList}
+              data={taskData}
+              renderItem={renderTaskCard}
+              keyExtractor={item => item.tid} />
         </SafeAreaView>
     );
 };
