@@ -148,8 +148,8 @@ def tasks_get_one_by_id(tid):
   except:
     return util.error500("Internal server error")
 
-@app.route('/tasks/<uid>', methods=['GET'])
-def tasks_get_all_by_user_and_task(uid):
+@app.route('/tasks/by-user/<uid>', methods=['GET'])
+def tasks_get_all_by_user(uid):
   try:
     uid = int(uid)
   except:
