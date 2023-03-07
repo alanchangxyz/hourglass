@@ -136,8 +136,8 @@ async function getGoogleCalendarData(date) {
     return responseJson;
   } catch (error) {
     console.error(error);
-    return [];
   }
+  return [];
 }
 
 // Request to database for tasks user scheduled for the date based on recommendations but marked as later
@@ -148,8 +148,8 @@ async function getScheduledTaskData(date) {
     return responseJson.filter(element => dateFilter(element, date));
   } catch (error) {
     console.error(error);
-    return DATA;
   }
+  return [];
 }
 
 // Merge calendar event data
