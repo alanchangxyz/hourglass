@@ -113,95 +113,91 @@ const styles = StyleSheet.create({
   },
 });
 
-const DATA = [
-  {
-    id: 0,
-    start_time: '9:00 AM',
-    end_time: '9:30 AM',
-    name: 'Event Name',
-    is_recommendation: false,
-  },
-  {
-    id: 1,
-    start_time: '9:00 AM',
-    end_time: '9:30 AM',
-    name: 'Event Name',
-    is_recommendation: true,
-  },
-  {
-    id: 2,
-    start_time: '9:00 AM',
-    end_time: '9:30 AM',
-    name: 'Event Name',
-    is_recommendation: false,
-  },
-  {
-    id: 3,
-    start_time: '9:00 AM',
-    end_time: '9:30 AM',
-    name: 'Event Name',
-    is_recommendation: false,
-  },
-  {
-    id: 4,
-    start_time: '9:00 AM',
-    end_time: '9:30 AM',
-    name: 'Event Name',
-    is_recommendation: true,
-  },
-  {
-    id: 5,
-    start_time: '9:00 AM',
-    end_time: '9:30 AM',
-    name: 'Event Name',
-    is_recommendation: false,
-  },
-  {
-    id: 6,
-    start_time: '9:00 AM',
-    end_time: '9:30 AM',
-    name: 'Event Name',
-    is_recommendation: false,
-  },
-  {
-    id: 7,
-    start_time: '9:00 AM',
-    end_time: '9:30 AM',
-    name: 'Event Name',
-    is_recommendation: true,
-  },
-];
+const API_URL = `https://hourglass.alanchang.xyz/api`;
+
+function recommendationFilter(obj, date) {
+  // recommendation should be chosen, not added to the calendar, and
+  // have a start date corresponding with the given date
+  start_time = new Date(obj.start_time.substring(0, 17));
+  date_check = new Date(date);
+
+  same_day =
+    start_time.getFullYear() == date_check.getFullYear() &&
+    start_time.getMonth() == date_check.getMonth() &&
+    start_time.getDay() == date_check.getDay();
+  return obj.chosen && !obj.added_to_cal && same_day;
+}
 
 // Request to Google Calendar API for the date
 async function getGoogleCalendarData(date) {
   date = date.toLocaleDateString().replaceAll('/', '-');
   try {
-    const response = await fetch(`https://hourglass.alanchang.xyz/api/calendar/${date}`);
+    const response = await fetch(`${API_URL}/calendar/${date}`);
     const responseJson = await response.json();
     return responseJson;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+// Request to database for tasks user scheduled for the date based on recommendations but marked as later
+async function getScheduledTaskData(date) {
+  try {
+    const response = await fetch(`${API_URL}/recommendations`);
+    const responseJson = await response.json();
+    return responseJson.filter(element => recommendationFilter(element, date));
   } catch (error) {
     console.error(error);
     return DATA;
   }
 }
 
-// Request to database for tasks user scheduled for the date based on recommendations but marked as later
-function getScheduledTaskData(date) {
-  return [];
-}
-
 // Merge calendar event data
 // TODO: Merge based on start time
 function mergeCalendarEvents(googleCalendarEvents, scheduledEvents) {
-  return googleCalendarEvents.concat(scheduledEvents);
+  if (!scheduledEvents) {
+    return googleCalendarEvents;
+  } else if (!googleCalendarEvents) {
+    return scheduledEvents;
+  }
+  var i = 0;
+  var j = 0;
+  var sortedArr = [];
+  while (i < googleCalendarEvents.length && j < scheduledEvents.length) {
+    calTime = new Date(googleCalendarEvents[i].start.dateTime);
+    schedTime = new Date(scheduledEvents[j]['start_time']);
+    if (calTime < schedTime) {
+      sortedArr.push(googleCalendarEvents[i]);
+      i++;
+    } else {
+      sortedArr.push(scheduledEvents[j]);
+      j++;
+    }
+  }
+  if (i < googleCalendarEvents.length) {
+    return sortedArr.concat(googleCalendarEvents.splice(i, googleCalendarEvents.length));
+  } else {
+    return sortedArr.concat(scheduledEvents.splice(j, scheduledEvents.length));
+  }
+}
+
+async function addTaskName(recTaskData) {
+  for (let i = 0; i < recTaskData.length; i++) {
+    const response = await fetch(`${API_URL}/tasks/${recTaskData[i].tid}`);
+    const responseJson = await response.json();
+    recTaskData[i]['name'] = await responseJson.name;
+  }
+  return recTaskData;
 }
 
 // Get google calendar and scheduled data and merge them into one list
 async function getHomepageCalData(date) {
   googleCalendarData = await getGoogleCalendarData(date);
-  // scheduledTaskData = getScheduledTaskData();
-  // combinedEventData = mergeCalendarEvents(googleCalendarData, scheduledTaskData);
-  return googleCalendarData;
+  scheduledTaskData = await getScheduledTaskData(date);
+  // scheduledTaskData = await addTaskName(scheduledTaskData);
+  combinedEventData = await mergeCalendarEvents(googleCalendarData, scheduledTaskData);
+  return combinedEventData;
 }
 
 const Header = props => {
@@ -330,22 +326,43 @@ const Home = () => {
     date = new Date(dateTime);
     hours = Number(dateTime.substring(11, 13));
     minutes = dateTime.substring(14, 16);
-    if (hours > 12) {
+    if (hours >= 12) {
       day_abbr = 'PM';
-      hours -= 12;
+      hours -= hours != 12 ? 12 : 0;
     } else {
       day_abbr = 'AM';
     }
     return hours + ':' + minutes + ' ' + day_abbr;
   }
 
-  const renderEventCard = ({ item }) => (
-    <CalendarCard
-      start_time={getEventTime(item.start.dateTime)}
-      end_time={getEventTime(item.end.dateTime)}
-      name={item.summary}
-    />
-  );
+  function getEventTimeRec(dateTime) {
+    date = new Date(dateTime);
+    hours = Number(dateTime.substring(17, 19));
+    minutes = dateTime.substring(20, 22);
+    if (hours >= 12) {
+      day_abbr = 'PM';
+      hours -= hours != 12 ? 12 : 0;
+    } else {
+      day_abbr = 'AM';
+    }
+    return hours + ':' + minutes + ' ' + day_abbr;
+  }
+
+  const renderEventCard = ({ item }) => {
+    return item.chosen ? (
+      <RecommendationCard
+        start_time={getEventTimeRec(item['start_time'])}
+        end_time={getEventTimeRec(item['end_time'])}
+        tid={item.tid}
+      />
+    ) : (
+      <CalendarCard
+        start_time={getEventTime(item.start.dateTime)}
+        end_time={getEventTime(item.end.dateTime)}
+        name={item.summary}
+      />
+    );
+  };
 
   return (
     <View>
@@ -355,7 +372,7 @@ const Home = () => {
         style={styles.eventList}
         data={calData}
         renderItem={renderEventCard}
-        keyExtractor={item => item.id}
+        keyExtractor={item => (item.chosen ? item['rid'] : item.id)}
       />
     </View>
   );
