@@ -115,9 +115,8 @@ const styles = StyleSheet.create({
 
 const API_URL = `https://hourglass.alanchang.xyz/api`;
 
-function recommendationFilter(obj, date) {
-  // recommendation should be chosen, not added to the calendar, and
-  // have a start date corresponding with the given date
+function dateFilter(obj, date) {
+  // recommendation should have a start date corresponding with the given date
   start_time = new Date(obj.start_time.substring(0, 17));
   date_check = new Date(date);
 
@@ -125,7 +124,7 @@ function recommendationFilter(obj, date) {
     start_time.getFullYear() == date_check.getFullYear() &&
     start_time.getMonth() == date_check.getMonth() &&
     start_time.getDay() == date_check.getDay();
-  return obj.chosen && !obj.added_to_cal && same_day;
+  return same_day;
 }
 
 // Request to Google Calendar API for the date
@@ -144,9 +143,9 @@ async function getGoogleCalendarData(date) {
 // Request to database for tasks user scheduled for the date based on recommendations but marked as later
 async function getScheduledTaskData(date) {
   try {
-    const response = await fetch(`${API_URL}/recommendations`);
+    const response = await fetch(`${API_URL}/recommendations/homepage`);
     const responseJson = await response.json();
-    return responseJson.filter(element => recommendationFilter(element, date));
+    return responseJson.filter(element => dateFilter(element, date));
   } catch (error) {
     console.error(error);
     return DATA;
@@ -182,20 +181,10 @@ function mergeCalendarEvents(googleCalendarEvents, scheduledEvents) {
   }
 }
 
-async function addTaskName(recTaskData) {
-  for (let i = 0; i < recTaskData.length; i++) {
-    const response = await fetch(`${API_URL}/tasks/${recTaskData[i].tid}`);
-    const responseJson = await response.json();
-    recTaskData[i]['name'] = await responseJson.name;
-  }
-  return recTaskData;
-}
-
 // Get google calendar and scheduled data and merge them into one list
 async function getHomepageCalData(date) {
   googleCalendarData = await getGoogleCalendarData(date);
   scheduledTaskData = await getScheduledTaskData(date);
-  // scheduledTaskData = await addTaskName(scheduledTaskData);
   combinedEventData = await mergeCalendarEvents(googleCalendarData, scheduledTaskData);
   return combinedEventData;
 }
@@ -353,7 +342,7 @@ const Home = () => {
       <RecommendationCard
         start_time={getEventTimeRec(item['start_time'])}
         end_time={getEventTimeRec(item['end_time'])}
-        tid={item.tid}
+        name={item.name}
       />
     ) : (
       <CalendarCard
