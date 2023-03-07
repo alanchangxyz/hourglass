@@ -66,6 +66,14 @@ def recs_get_all_by_user_and_task(uid, tid):
   except:
     return util.error500("Internal server error")
 
+@app.route('/recommendations/homepage', methods=['GET'])
+def recs_get_homepage():
+  try:
+    cursor.execute(f'SELECT r.start_time, r.end_time, t.name FROM recommendations r, tasks t WHERE r.chosen = True AND r.added_to_cal = False AND t.tid = r.tid')
+    return cursor.fetchall()
+  except:
+    return util.error500("Internal server error")
+
 @app.route('/recommendations', methods=['POST'])
 def recommendations_create_one():
   js = request.get_json() #start_time, #end_time, min_offset, chosen, added_to_cal, uid, tid
