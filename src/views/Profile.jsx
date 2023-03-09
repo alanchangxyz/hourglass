@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
+  Button,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -9,75 +10,34 @@ import {
   View,
 } from 'react-native';
 
+import { ALANS_EMAIL, OLIVIAS_EMAIL } from '@env';
+import { useAuth } from '../util/Auth';
+
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+  changeUserButton: {
+    backgroundColor: 'green',
+    marginVertical: 16,
   },
 });
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const Profile = () => {
+  const { changeUser, currentUser } = useAuth();
 
-/* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
- * LTI update could not be added via codemod */
-// const Section = ({children, title}): Node => {
-const Section = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+      <Text>The current user is {JSON.stringify(currentUser)}</Text>
+      <Button
+        style={styles.changeUserButton}
+        title="Switch User"
+        onPress={() => changeUser(currentUser?.email === ALANS_EMAIL ? OLIVIAS_EMAIL : ALANS_EMAIL)}
+      />
     </View>
   );
-};
-
-const Profile = () => {
-  const [name, setName] = useState('user');
-
-  return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Text>Try editing me! 🎉</Text>
-      </View>
-    );
 };
 
 export default Profile;
