@@ -132,10 +132,9 @@ def get_ranking(tid, start_date, end_date):
     _, end_range = end_date.split(" ")
     unfiltered_rankings = get_unfiltered_ranking(tid, start_range, end_range)
     filtered_rankings = filter_by_calendar(unfiltered_rankings, date)
-    return filtered_rankings
+    return convert_to_json(filtered_rankings)
 
 
 if __name__ == "__main__":
     rankings = get_ranking(tid = 845422236096167937, start_date = "03/08/2023 12:00:00", end_date = "03/08/2023 14:00:00")
-    rankingsJSON = convert_to_json(rankings)
-    print(rankingsJSON)
+    print(rankings)

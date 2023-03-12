@@ -3,6 +3,7 @@ from psycopg2.errors import UniqueViolation
 import pytz
 from db import query, connection, cursor
 from gcal import credential_authorization, save_credentials, request_events
+from knn import get_ranking
 
 import util
 
@@ -347,12 +348,42 @@ def finishAuth():
 # Google Calendar Get Events at Date
 @app.route('/calendar/<date>', methods=['GET'])
 def calendar_get_one(date):
+  try:
+    dt = datetime.strptime(date, "%m-%d-%Y")
+  except:
+    return util.error400('Invalid datetime format supplied')
   start_date_pst = datetime.strptime(f"{date} 00:00:00","%m-%d-%Y %H:%M:%S")
   end_date_pst = datetime.strptime(f"{date} 00:00:00","%m-%d-%Y %H:%M:%S")+ timedelta(days = 1)
   pst_time = pytz.timezone("America/Los_Angeles")
   start_date_utc = pst_time.localize(start_date_pst, is_dst=None).astimezone(pytz.utc).isoformat().replace("+00:00", "Z")
   end_date_utc = pst_time.localize(end_date_pst, is_dst=None).astimezone(pytz.utc).isoformat().replace("+00:00", "Z")
   return request_events(start_date_utc, end_date_utc)
+
+# Generate Recommendation List
+@app.route('/recommendations/generate/<tid>/<date>/<time1>/<time2>', methods=['GET'])
+def recommendations_generate(tid, date, time1, time2):
+  try:
+    tid = int(tid)
+  except:
+    return util.error400('Invalid task ID supplied')
+  if not tid or not isinstance(tid, int):
+    return util.error400('Invalid task ID supplied')
+
+  try:
+    datetime1 = f"{date} {time1}"
+    dt1 = datetime.strptime(datetime1, "%m-%d-%Y %H:%M:%S")
+  except:
+    return util.error400('Invalid datetime format supplied')
+  try:
+    datetime2 = f"{date} {time2}"
+    dt2 = datetime.strptime(datetime2, "%m-%d-%Y %H:%M:%S")
+  except:
+    return util.error400('Invalid datetime format supplied')
+
+  if dt1 >= dt2:
+    return util.error400('Invalid window for datetimes supplied')
+
+  return get_ranking(tid, datetime1, datetime2)
 
 if __name__ == '__main__':
   if os.getenv('DEV_ENV') == 'production':
