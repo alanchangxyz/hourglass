@@ -1,9 +1,7 @@
 import React from 'react';
-import { Text } from 'react-native';
-// import {createNativeStackNavigator} from '@react-navigation/native-stack';
-// import {NativeBaseProvider} from 'native-base';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { House, ListChecks, ListDashes, UserCircle } from 'phosphor-react-native';
 
 // Contexts
 import { AuthProvider } from './src/util/Auth';
@@ -18,22 +16,22 @@ import ProfileView from './src/views/Profile';
 const routeMappings = {
   Home: {
     name: "Home",
-    tab: <Text>Home Icon</Text>,
+    tab: <House />,
     component: HomeView,
   },
   Schedule: {
     name: "Schedule",
-    tab: <Text>Schedule Icon</Text>,
+    tab: <ListDashes />,
     component: ScheduleView,
   },
   Tasks: {
     name: "Tasks",
-    tab: <Text>Tasks Icon</Text>,
+    tab: <ListChecks />,
     component: TasksView,
   },
   Profile: {
     name: "Profile",
-    tab: <Text>Profile Icon</Text>,
+    tab: <UserCircle />,
     component: ProfileView,
   },
 };
@@ -48,10 +46,11 @@ const App = () => {
         <NavigationContainer>
           <Tab.Navigator
             initialRouteName="Home"
+            backBehavior="order"
             screenOptions={({ route }) => ({
               tabBarIcon: () => routeMappings[route.name].tab
             })}
-            >
+          >
             {Object.keys(routeMappings).map(r => (
               <Tab.Screen
                 key={routeMappings[r].name}
