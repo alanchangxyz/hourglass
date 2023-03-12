@@ -86,3 +86,5 @@ pip-selfcheck.json
 
 .env
 process.env
+credentials.json
+token.json
