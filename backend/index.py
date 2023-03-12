@@ -246,8 +246,8 @@ def users_get_all():
   try:
     cursor.execute('SELECT * from users ORDER BY users.id')
     return cursor.fetchall()
-  except:
-    return util.error500("Internal server error")
+  except Exception as e:
+    return util.error500(f"Internal server error - {e}")
 
 @app.route('/users/by-id/<uid>', methods=['GET'])
 def users_get_one_by_id(uid):
