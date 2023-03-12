@@ -119,11 +119,10 @@ function dateFilter(obj, date) {
   // recommendation should have a start date corresponding with the given date
   start_time = new Date(obj.start_time.substring(0, 17));
   date_check = new Date(date);
-
   same_day =
     start_time.getFullYear() == date_check.getFullYear() &&
     start_time.getMonth() == date_check.getMonth() &&
-    start_time.getDay() == date_check.getDay();
+    start_time.getDate() == date_check.getDate();
   return same_day;
 }
 
