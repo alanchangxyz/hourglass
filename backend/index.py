@@ -30,6 +30,8 @@ def recs_get_all():
   res = cursor.fetchall()
   for rec in res:
     rec['rid'] = str(rec['rid'])
+    rec['start_time'] = rec['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    rec['end_time'] = rec['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
   return util.status200(res)
 
 @app.route('/recommendations/<rid>', methods=['GET'])
@@ -47,6 +49,8 @@ def recs_get_one_by_id(rid):
     if not res:
       return util.status200(None)
     res['rid'] = str(res['rid'])
+    res['start_time'] = res['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    res['end_time'] = res['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -67,6 +71,8 @@ def recs_get_all_by_user_and_task(uid, tid):
     if not res:
       return util.status200(None)
     res['rid'] = str(res['rid'])
+    res['start_time'] = res['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    res['end_time'] = res['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -78,6 +84,8 @@ def recs_get_homepage():
     res = cursor.fetchall()
     for rec in res:
       rec['rid'] = str(rec['rid'])
+      rec['start_time'] = rec['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+      rec['end_time'] = rec['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -93,6 +101,8 @@ def recommendations_create_one():
     connection.commit()
     res = cursor.fetchone()
     res['rid'] = str(res['rid'])
+    res['start_time'] = res['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    res['end_time'] = res['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -118,6 +128,8 @@ def recommendations_edit_one(rid):
     if not res:
       return util.status200(None)
     res['rid'] = str(res['rid'])
+    res['start_time'] = res['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    res['end_time'] = res['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     return util.status200(res)
   except:
     return util.error500("Internal server error")
