@@ -3,14 +3,14 @@ import React, { createContext, useContext } from 'react';
 import { REACT_APP_API_URL_PROD } from '@env';
 
 const baseURL = REACT_APP_API_URL_PROD;
-console.log('backend baseURL is', baseURL);
+console.log('backend baseURL is', REACT_APP_API_URL_PROD);
 
 const BackendContext = createContext();
 const useBackend = () => useContext(BackendContext);
 
 const BackendProvider = ({ children }) => {
   const backend = axios.create({
-    baseURL,
+    REACT_APP_API_URL_PROD,
     withCredentials: false,
   });
 

@@ -12,14 +12,13 @@ import HomeView from './src/views/Home';
 import ScheduleTabNavigator from './src/navigators/ScheduleTab';
 import TasksView from './src/views/Tasks';
 import ProfileView from './src/views/Profile';
+import ScheduleView from './src/views/Schedule';
 
-<<<<<<< HEAD
-//View names
 const home = "Home";
-const schedule = "Schedule a Task";
+const schedule = "Schedule";
 const tasks = "Tasks";
 const profile = "Profile";
-=======
+
 const routeMappings = {
   Home: {
     name: "Home",
@@ -30,6 +29,7 @@ const routeMappings = {
     name: "Schedule",
     tab: <ListDashes />,
     component: ScheduleView,
+    options: { headerShown: false },
   },
   Tasks: {
     name: "Tasks",
@@ -42,54 +42,17 @@ const routeMappings = {
     component: ProfileView,
   },
 };
->>>>>>> master
 
 // Navigation Tab
 const Tab = createBottomTabNavigator();
 
-<<<<<<< HEAD
-function NavigationBar() {
-  return (
-    <NavigationContainer>
-      <Tab.Navigator
-        initialRouteName={home}
-        screenOptions={({ route }) => ({
-          tabBarIcon: () => {
-            if (route.name === home) {
-              return <Text>Home Icon</Text>;
-            }
-            else if (route.name === schedule) {
-              return <Text>Schedule Icon</Text>
-            }
-            else if (route.name === tasks) {
-              return <Text>Tasks Icon</Text>
-            }
-            else if (route.name === profile) {
-              return <Text>Profile Icon</Text>;
-            }
-          },
-        })}
-        >
-
-        <Tab.Screen name={home} component={HomeView} />
-        <Tab.Screen name={schedule} component={ScheduleTabNavigator} options={{headerShown: false}}/>
-        <Tab.Screen name={tasks} component={TasksView} />
-        <Tab.Screen name={profile} component={ProfileView} />
-
-      </Tab.Navigator>
-    </NavigationContainer>
-  );
-}
-
-=======
->>>>>>> master
 const App = () => {
   return (
     <BackendProvider>
       <AuthProvider>
         <NavigationContainer>
           <Tab.Navigator
-            initialRouteName="Home"
+            initialRouteName={home}
             backBehavior="order"
             screenOptions={({ route }) => ({
               tabBarIcon: () => routeMappings[route.name].tab
@@ -100,6 +63,7 @@ const App = () => {
                 key={routeMappings[r].name}
                 name={routeMappings[r].name}
                 component={routeMappings[r].component}
+                {...(routeMappings[r].options ?? {})}
               />
             ))}
           </Tab.Navigator>
