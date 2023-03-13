@@ -3,6 +3,7 @@ from psycopg2.errors import UniqueViolation
 import pytz
 from db import query, connection, cursor
 from gcal import credential_authorization, save_credentials, request_events
+from knn import get_ranking
 
 import util
 
@@ -27,7 +28,12 @@ def home():
 @app.route('/recommendations', methods=['GET'])
 def recs_get_all():
   cursor.execute('SELECT * from recommendations')
-  return cursor.fetchall()
+  res = cursor.fetchall()
+  for rec in res:
+    rec['rid'] = str(rec['rid'])
+    rec['start_time'] = rec['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    rec['end_time'] = rec['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+  return util.status200(res)
 
 @app.route('/recommendations/<rid>', methods=['GET'])
 def recs_get_one_by_id(rid):
@@ -43,6 +49,9 @@ def recs_get_one_by_id(rid):
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+    res['rid'] = str(res['rid'])
+    res['start_time'] = res['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    res['end_time'] = res['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -62,9 +71,30 @@ def recs_get_all_by_user_and_task(uid, tid):
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+    res['rid'] = str(res['rid'])
+    res['start_time'] = res['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    res['end_time'] = res['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     return util.status200(res)
   except:
     return util.error500("Internal server error")
+
+@app.route('/recommendations/homepage', methods=['GET'])
+def recs_get_homepage():
+  # try:
+  cursor.execute(f'SELECT * FROM recommendations r, tasks t WHERE r.chosen = True AND r.added_to_cal = False AND t.tid = r.tid')
+  res = cursor.fetchall()
+  for rec in res:
+    rec['rid'] = str(rec['rid'])
+    rec['uid'] = str(rec['uid'])
+    rec['tid'] = str(rec['tid'])
+    rec['start_time'] = rec['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    rec['end_time'] = rec['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    rec['start_range'] = rec['start_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    rec['end_range'] = rec['end_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+
+  return util.status200(res)
+  # except:
+  #   return util.error500("Internal server error")
 
 @app.route('/recommendations', methods=['POST'])
 def recommendations_create_one():
@@ -75,7 +105,11 @@ def recommendations_create_one():
       (start_time, end_time, min_offset, chosen, added_to_cal, uid, tid)\
       VALUES (%s, %s, %d, %d, %s, %s) RETURNING *', (js['start_time'], js['end_time'], js['min_offset'], js['chosen'], js['added_to_cal'], js['uid'], js['tid']))
     connection.commit()
-    return util.status200(cursor.fetchone())
+    res = cursor.fetchone()
+    res['rid'] = str(res['rid'])
+    res['start_time'] = res['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    res['end_time'] = res['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    return util.status200(res)
   except:
     return util.error500("Internal server error")
 
@@ -99,6 +133,9 @@ def recommendations_edit_one(rid):
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+    res['rid'] = str(res['rid'])
+    res['start_time'] = res['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    res['end_time'] = res['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -119,7 +156,7 @@ def recommendations_delete_one(rid):
       return util.status200({'deleted': None})
     cursor.execute(f'DELETE from recommendations WHERE rid = %s', (rid,))
     connection.commit()
-    return util.status200({'deleted': rid})
+    return util.status200({'deleted': str(rid)})
   except:
     return util.error500("Internal server error")
 
@@ -128,7 +165,13 @@ def recommendations_delete_one(rid):
 @app.route('/tasks', methods=['GET'])
 def tasks_get_all():
   cursor.execute('SELECT * from tasks')
-  return cursor.fetchall()
+  res = cursor.fetchall()
+
+  for task in res:
+    task['tid'] = str(task['tid'])
+    task['uid'] = str(task['uid'])
+
+  return util.status200(res)
 
 @app.route('/tasks/<tid>', methods=['GET'])
 def tasks_get_one_by_id(tid):
@@ -144,12 +187,16 @@ def tasks_get_one_by_id(tid):
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+
+    res['tid'] = str(res['tid'])
+    res['uid'] = str(res['uid'])
+
     return util.status200(res)
   except:
     return util.error500("Internal server error")
 
-@app.route('/tasks/<uid>', methods=['GET'])
-def tasks_get_all_by_user_and_task(uid):
+@app.route('/tasks/by-user/<uid>', methods=['GET'])
+def tasks_get_all_by_user(uid):
   try:
     uid = int(uid)
   except:
@@ -158,23 +205,31 @@ def tasks_get_all_by_user_and_task(uid):
     return util.error400('Invalid user ID supplied')
 
   try:
-    cursor.execute(f'SELECT * from recommendations WHERE uid = %s', (uid,))
+    cursor.execute(f'SELECT * from tasks WHERE uid = %s ORDER BY tasks.tid', (uid,))
     res = cursor.fetchall()
     if not res:
       return util.status200(None)
+
+    for task in res:
+      task['tid'] = str(task['tid'])
+      task['uid'] = str(task['uid'])
+
     return util.status200(res)
   except:
     return util.error500("Internal server error")
 
 @app.route('/tasks', methods=['POST'])
 def tasks_create_one():
-  js = request.get_json() #uid, name, priority, duration, start_range, end_range
+  js = request.get_json() #uid, name, duration
 
   try:
-    cursor.execute(f'INSERT INTO tasks (uid, name, priority, duration, start_range, end_range)\
-      VALUES (%s, %s, %d, %d, %s, %s) RETURNING *', (js['uid'], js['name'], js['priority'], js['duration'], js['start_range'], js['end_range']))
+    cursor.execute(f'INSERT INTO tasks (uid, name, duration)\
+      VALUES (%s, %s, %d) RETURNING *', (js['uid'], js['name'], js['duration']))
     connection.commit()
-    return util.status200(cursor.fetchone())
+    res = cursor.fetchone()
+    res['tid'] = str(res['tid'])
+    res['uid'] = str(res['uid'])
+    return util.status200(res)
   except:
     return util.error500("Internal server error")
 
@@ -186,18 +241,20 @@ def tasks_edit_one(tid):
     return util.error400('Invalid task ID supplied')
   if not tid or not isinstance(tid, int):
     return util.error400('Invalid task ID supplied')
-  js = request.get_json() #uid, name, priority, duration, start_range, end_range
+  js = request.get_json() #uid, name, duration
 
   try:
     cursor.execute(f'UPDATE tasks\
-      SET name = %s, priority = %s, duration = %d, start_range = %s, end_range = %s WHERE tid = %s',\
-      (js['name'], js['priority'], js['duration'], js['start_range'], js['end_range'], tid)
+      SET uid = %s, name = %s, duration = %d WHERE tid = %s',\
+      (js['uid'], js['name'], js['duration'], tid)
     )
     connection.commit()
     cursor.execute(f'SELECT * from tasks WHERE tid = %s', (tid,))
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+    res['tid'] = str(res['tid'])
+    res['uid'] = str(res['uid'])
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -218,7 +275,7 @@ def tasks_delete_one(tid):
       return util.status200({'deleted': None})
     cursor.execute(f'DELETE from tasks WHERE tid = %s', (tid,))
     connection.commit()
-    return util.status200({'deleted': tid})
+    return util.status200({'deleted': str(tid)})
   except:
     return util.error500("Internal server error")
 
@@ -228,9 +285,13 @@ def tasks_delete_one(tid):
 def users_get_all():
   try:
     cursor.execute('SELECT * from users ORDER BY users.id')
-    return cursor.fetchall()
-  except:
-    return util.error500("Internal server error")
+    res = cursor.fetchall()
+    for row in res:
+      row['id'] = str(row['id'])
+
+    return util.status200(res)
+  except Exception as e:
+    return util.error500(f"Internal server error - {e}")
 
 @app.route('/users/by-id/<uid>', methods=['GET'])
 def users_get_one_by_id(uid):
@@ -246,6 +307,7 @@ def users_get_one_by_id(uid):
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+    res['id'] = str(res['id'])
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -257,6 +319,7 @@ def users_get_one_by_email(email):
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+    res['id'] = str(res['id'])
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -270,7 +333,9 @@ def users_create_one():
   try:
     cursor.execute(f'INSERT INTO users (email, fname, lname) VALUES (%s, %s, %s) RETURNING *', (js['email'], js['fname'], js['lname']))
     connection.commit()
-    return util.status200(cursor.fetchone())
+    res = cursor.fetchone()
+    res['id'] = str(res['id'])
+    return util.status200(res)
   except:
     return util.error500("Internal server error")
 
@@ -293,6 +358,7 @@ def users_edit_one(uid):
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+    res['id'] = str(res['id'])
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -313,7 +379,7 @@ def users_delete_one(uid):
       return util.status200({'deleted': None})
     cursor.execute(f'DELETE from users WHERE id = %s', (uid,))
     connection.commit()
-    return util.status200({'deleted': uid})
+    return util.status200({'deleted': str(uid)})
   except:
     return util.error500("Internal server error")
 
@@ -330,12 +396,42 @@ def finishAuth():
 # Google Calendar Get Events at Date
 @app.route('/calendar/<date>', methods=['GET'])
 def calendar_get_one(date):
+  try:
+    dt = datetime.strptime(date, "%m-%d-%Y")
+  except:
+    return util.error400('Invalid datetime format supplied')
   start_date_pst = datetime.strptime(f"{date} 00:00:00","%m-%d-%Y %H:%M:%S")
   end_date_pst = datetime.strptime(f"{date} 00:00:00","%m-%d-%Y %H:%M:%S")+ timedelta(days = 1)
   pst_time = pytz.timezone("America/Los_Angeles")
   start_date_utc = pst_time.localize(start_date_pst, is_dst=None).astimezone(pytz.utc).isoformat().replace("+00:00", "Z")
   end_date_utc = pst_time.localize(end_date_pst, is_dst=None).astimezone(pytz.utc).isoformat().replace("+00:00", "Z")
   return request_events(start_date_utc, end_date_utc)
+
+# Generate Recommendation List
+@app.route('/recommendations/generate/<tid>/<date>/<time1>/<time2>', methods=['GET'])
+def recommendations_generate(tid, date, time1, time2):
+  try:
+    tid = int(tid)
+  except:
+    return util.error400('Invalid task ID supplied')
+  if not tid or not isinstance(tid, int):
+    return util.error400('Invalid task ID supplied')
+
+  try:
+    datetime1 = f"{date} {time1}"
+    dt1 = datetime.strptime(datetime1, "%m-%d-%Y %H:%M:%S")
+  except:
+    return util.error400('Invalid datetime format supplied')
+  try:
+    datetime2 = f"{date} {time2}"
+    dt2 = datetime.strptime(datetime2, "%m-%d-%Y %H:%M:%S")
+  except:
+    return util.error400('Invalid datetime format supplied')
+
+  if dt1 >= dt2:
+    return util.error400('Invalid window for datetimes supplied')
+
+  return get_ranking(tid, datetime1, datetime2)
 
 if __name__ == '__main__':
   if os.getenv('DEV_ENV') == 'production':

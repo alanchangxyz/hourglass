@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2 import Error
 from psycopg2.extras import RealDictCursor
+import pandas.io.sql as sqlio
 
 import os
 from dotenv import load_dotenv
@@ -25,3 +26,13 @@ def rollback():
     print ('Connection rolled back')
   except (Exception, Error) as error:
     print ('Error:', error)
+
+
+def query_pandas(create_table_query):
+    try:
+        # create connection
+        data = sqlio.read_sql_query(create_table_query, connection)
+        return data
+
+    except (Exception, Error) as error:
+        print ("Error creating table ", error)
