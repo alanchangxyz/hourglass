@@ -127,34 +127,7 @@ function dateFilter(obj, date) {
   return same_day;
 }
 
-// Request to Google Calendar API for the date
-async function getGoogleCalendarData(date) {
-  const { backend } = useBackend();
-  date = date.toLocaleDateString().replaceAll('/', '-');
-  try {
-    const response = await backend.get(`/calendar/${date}`);
-    const responseData = response.data;
-    return responseData;
-  } catch (error) {
-    console.error(error);
-  }
-  return [];
-}
-
-// Request to database for tasks user scheduled for the date based on recommendations but marked as later
-async function getScheduledTaskData(date) {
-  try {
-    const response = await backend.get(`/recommendations/homepage`);
-    const responseData = response.data;
-    return responseData.filter(element => dateFilter(element, date));
-  } catch (error) {
-    console.error(error);
-  }
-  return [];
-}
-
 // Merge calendar event data
-// TODO: Merge based on start time
 function mergeCalendarEvents(googleCalendarEvents, scheduledEvents) {
   if (!scheduledEvents) {
     return googleCalendarEvents;
@@ -180,14 +153,6 @@ function mergeCalendarEvents(googleCalendarEvents, scheduledEvents) {
   } else {
     return sortedArr.concat(scheduledEvents.splice(j, scheduledEvents.length));
   }
-}
-
-// Get google calendar and scheduled data and merge them into one list
-async function getHomepageCalData(date) {
-  googleCalendarData = await getGoogleCalendarData(date);
-  scheduledTaskData = await getScheduledTaskData(date);
-  combinedEventData = await mergeCalendarEvents(googleCalendarData, scheduledTaskData);
-  return combinedEventData;
 }
 
 const Header = props => {
