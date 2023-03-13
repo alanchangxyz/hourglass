@@ -35,32 +35,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// async function createTask(taskName, taskHours, taskMins) {
-//   try {
-//     taskDuration = Number(taskHours) * 60 + Number(taskMins);
-//     body = JSON.stringify({
-//       name: taskName,
-//       duration: taskDuration
-//     });
-//     console.log(body);
-
-//     const response = backend.post(`https://hourglass.alanchang.xyz/api/tasks`, {
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify({
-//         name: taskName,
-//         duration: taskDuration
-//       })
-//     });
-//     const responseJson = await response.json();
-//     console.log("success")
-//     console.log(responseJson);
-//     return responseJson;
-//   } catch (error) {
-//     console.error(error);
-//     // return DATA;
-//   }
-// }
-
 const TaskNameField = ({ setTaskName }) => {
   return (
     <View>
