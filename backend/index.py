@@ -79,16 +79,21 @@ def recs_get_all_by_user_and_task(uid, tid):
 
 @app.route('/recommendations/homepage', methods=['GET'])
 def recs_get_homepage():
-  try:
-    cursor.execute(f'SELECT * FROM recommendations r, tasks t WHERE r.chosen = True AND r.added_to_cal = False AND t.tid = r.tid')
-    res = cursor.fetchall()
-    for rec in res:
-      rec['rid'] = str(rec['rid'])
-      rec['start_time'] = rec['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
-      rec['end_time'] = rec['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
-    return util.status200(res)
-  except:
-    return util.error500("Internal server error")
+  # try:
+  cursor.execute(f'SELECT * FROM recommendations r, tasks t WHERE r.chosen = True AND r.added_to_cal = False AND t.tid = r.tid')
+  res = cursor.fetchall()
+  for rec in res:
+    rec['rid'] = str(rec['rid'])
+    rec['uid'] = str(rec['uid'])
+    rec['tid'] = str(rec['tid'])
+    rec['start_time'] = rec['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    rec['end_time'] = rec['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    rec['start_range'] = rec['start_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    rec['end_range'] = rec['end_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+
+  return util.status200(res)
+  # except:
+  #   return util.error500("Internal server error")
 
 @app.route('/recommendations', methods=['POST'])
 def recommendations_create_one():
