@@ -13,34 +13,22 @@ import {
 import TaskCard from '../components/TaskCard'
 import { useBackend } from '../util/Backend';
 
-
-
 const ScheduleView = ({ navigation }) => {
-  
+  const { backend }  = useBackend();
   const [selectedTask, setSelectedTask] = useState({name: "", duration: 0});
 
   // TODO: pull tasks from backend and then display all task cards
-  async function getTasks() {
-    const {backend}  = useBackend();
-    try {
-      const response = await fetch('https://hourglass.alanchang.xyz/api/tasks')
-      // const response = await backend.get('/tasks')
-      const responseData = response.body
-      console.log(responseData)
-      return responseData;
-    } catch (error) {
-      console.log(error.response.data)
-    }
-    return [];
-    
-  }
-  
+  const getTasks = async () => {
+    const { data : res } = await backend.get('/tasks');
+    return res;
+  };
+
   const TaskCardsList = props => {
     let tasks = getTasks();
     const renderTaskCard  = ({task}) => {
       return (<TaskCard name={task.name} duration={task.duration} setSelectedTask={setSelectedTask} selectedTask={selectedTask}></TaskCard>)
     }
-    return 
+    return
     (<SafeAreaView>
       <FlatList
         data={tasks}
@@ -50,6 +38,10 @@ const ScheduleView = ({ navigation }) => {
     </SafeAreaView>);
 
   }
+
+  useEffect(() => {
+    getTasks();
+  }, []);
 
   return (
     <SafeAreaView>
@@ -72,7 +64,7 @@ const ScheduleView = ({ navigation }) => {
         <TaskCard name="Coffee chat" duration={30} selectedTask={selectedTask} setSelectedTask={setSelectedTask}/>
         <TaskCardsList/>
       </ScrollView>
-      
+
     </SafeAreaView>
   );
 };

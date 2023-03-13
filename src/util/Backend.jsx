@@ -10,7 +10,7 @@ const useBackend = () => useContext(BackendContext);
 
 const BackendProvider = ({ children }) => {
   const backend = axios.create({
-    REACT_APP_API_URL_PROD,
+    baseURL,
     withCredentials: false,
   });
 
