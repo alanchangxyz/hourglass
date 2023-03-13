@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableWithoutFeedback } from 'react-native';
+import { useBackend } from '../util/Backend';
 
 const styles = StyleSheet.create({
   headerName: {
@@ -113,8 +114,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const API_URL = `https://hourglass.alanchang.xyz/api`;
-
 function dateFilter(obj, date) {
   // recommendation should have a start date corresponding with the given date
   start_time = new Date(obj.start_time.substring(0, 17));
@@ -128,11 +127,12 @@ function dateFilter(obj, date) {
 
 // Request to Google Calendar API for the date
 async function getGoogleCalendarData(date) {
+  const { backend } = useBackend();
   date = date.toLocaleDateString().replaceAll('/', '-');
   try {
-    const response = await fetch(`${API_URL}/calendar/${date}`);
-    const responseJson = await response.json();
-    return responseJson;
+    const response = await backend.get(`/calendar/${date}`);
+    const responseData = response.data;
+    return responseData;
   } catch (error) {
     console.error(error);
   }
@@ -142,9 +142,9 @@ async function getGoogleCalendarData(date) {
 // Request to database for tasks user scheduled for the date based on recommendations but marked as later
 async function getScheduledTaskData(date) {
   try {
-    const response = await fetch(`${API_URL}/recommendations/homepage`);
-    const responseJson = await response.json();
-    return responseJson.filter(element => dateFilter(element, date));
+    const response = await backend.get(`/recommendations/homepage`);
+    const responseData = response.data;
+    return responseData.filter(element => dateFilter(element, date));
   } catch (error) {
     console.error(error);
   }
@@ -198,15 +198,34 @@ const Header = props => {
 };
 
 const DateCard = props => {
+  const { backend } = useBackend();
   async function onSelectDateCard() {
     // Update the DateCard that is highlighted
     props.updateFocused();
 
+    date = props.date;
+
     // Get the homepage data
-    homepageData = await getHomepageCalData(props.date);
+    date = date.toLocaleDateString().replaceAll('/', '-');
+    let responseCalData = [];
+    let responseRecFiltered = [];
+    try {
+      const responseCal = await backend.get(`/calendar/${date}`);
+      responseCalData = responseCal.data;
+    } catch (error) {
+      console.error(error);
+    }
+    try {
+      const responseRec = await backend.get(`/recommendations/homepage`);
+      const responseRecData = responseRec.data;
+      responseRecFiltered = responseRecData.filter(element => dateFilter(element, date));
+    } catch (error) {
+      console.error(error);
+    }
+    combinedEventData = await mergeCalendarEvents(responseCalData, responseRecFiltered);
 
     // Set the data from the calendar
-    props.setCalendarData(homepageData);
+    props.setCalendarData(combinedEventData);
   }
   return (
     <TouchableWithoutFeedback onPress={() => onSelectDateCard()}>
@@ -306,9 +325,32 @@ const RecommendationCard = props => {
 
 const Home = () => {
   const [calData, setCalData] = useState();
+  const { backend } = useBackend();
   useEffect(() => {
-    getHomepageCalData(new Date()).then(data => setCalData(data));
+    getHomepageCalDataHome(new Date()).then(data => setCalData(data));
   }, []);
+
+  async function getHomepageCalDataHome(date) {
+    // Get the homepage data
+    date = date.toLocaleDateString().replaceAll('/', '-');
+    let responseCalData = [];
+    let responseRecFiltered = [];
+    try {
+      const responseCal = await backend.get(`/calendar/${date}`);
+      responseCalData = responseCal.data;
+    } catch (error) {
+      console.error(error);
+    }
+    try {
+      const responseRec = await backend.get(`/recommendations/homepage`);
+      const responseRecData = responseRec.data;
+      responseRecFiltered = responseRecData.filter(element => dateFilter(element, date));
+    } catch (error) {
+      console.error(error);
+    }
+    combinedEventData = await mergeCalendarEvents(responseCalData, responseRecFiltered);
+    return combinedEventData;
+  }
 
   function getEventTime(dateTime) {
     date = new Date(dateTime);
