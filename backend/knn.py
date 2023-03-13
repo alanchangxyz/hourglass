@@ -18,8 +18,8 @@ def get_recommendations(tid):
     get_recommendation_query = f"SELECT * FROM recommendations WHERE tid = {tid};"
     return query_pandas(get_recommendation_query)
 
-def get_task_window(tid):
-    get_task_window_query = f"SELECT start_range, end_range, duration FROM tasks WHERE tid = {tid};"
+def get_task_data(tid):
+    get_task_window_query = f"SELECT duration FROM tasks WHERE tid = {tid};"
     return query_pandas(get_task_window_query)
 
 def create_time_lists(start_time, end_time, duration, step_size):
@@ -40,12 +40,6 @@ def get_recommendations_data(tid):
     df_recs["start_time"] = ((start_times.hour * 60 + start_times.minute) * 60 + start_times.second)
     df_recs["chosen"] = df_recs["chosen"].astype(int)
     return df_recs
-
-def get_task_data(tid):
-    df_tasks = get_task_window(tid)
-    df_tasks["start_range"] = df_tasks['start_range'].dt.time
-    df_tasks["end_range"] = df_tasks['end_range'].dt.time
-    return df_tasks
 
 def generate_step_size(duration, start_range, end_range):
     duration = timedelta(minutes=int(duration))
