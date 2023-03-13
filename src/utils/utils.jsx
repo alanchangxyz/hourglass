@@ -94,7 +94,15 @@ export const styles = StyleSheet.create({
     },
     validButton: {
         alignSelf: "center"
+    },
+    timeSelectorContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+    },
+    timeSelectorTitle: {
+        alignSelf: 'center'
     }
+
   });
 
 
@@ -153,4 +161,36 @@ export function convertMilitaryTime(time) {
         ampm = " AM"
     }
     return hour.toString() + ":" + minute.toString() + ampm
+}
+
+export function parseDate(string) {
+    var parts_of_date = string.split("/")
+    var month = parts_of_date[0] 
+    var day = parts_of_date[1]
+    if (month.length == 1) {
+        month = "0" + month 
+    }
+    if (day.length == 1) {
+        day = "0" + day
+    }
+    return month + "-" + day + "-" + parts_of_date[2]
+}
+
+export function parseTime(string) {
+    var time = string.split(" ")[1].split(":")
+    var ampm = string.split(" ")[2]
+    var hour = parseInt(time[0])
+    var minute = time[1]
+    var second = time[2]
+
+    if (ampm == "PM" && hour != 12) {
+        hour = hour + 12
+    } else if ( ampm == "AM" && hour == 12) {
+        hour = 0
+    }
+    hour = hour.toString()
+    if (hour.length == 1) {
+        hour = "0" + hour
+    }
+    return hour + ":" + minute + ":" + second
 }

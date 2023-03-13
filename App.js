@@ -28,7 +28,7 @@ const routeMappings = {
   Schedule: {
     name: "Schedule",
     tab: <ListDashes />,
-    component: ScheduleView,
+    component: ScheduleTabNavigator,
     options: { headerShown: false },
   },
   Tasks: {
@@ -40,7 +40,7 @@ const routeMappings = {
     name: "Profile",
     tab: <UserCircle />,
     component: ProfileView,
-  },
+  }
 };
 
 // Navigation Tab

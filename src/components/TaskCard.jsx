@@ -14,9 +14,9 @@ import {styles} from "../utils/utils"
 export default TaskCard = props => {
     const updateSelection = () => {
         if (props.selectedTask.name === props.name) {
-            props.setSelectedTask({name: "", duration: 0})
+            props.setSelectedTask({name: "", duration: 0, tid:""})
         } else {
-            props.setSelectedTask({name: props.name, duration: props.duration})
+            props.setSelectedTask({name: props.name, duration: props.duration, tid:props.tid})
         }
     };
 

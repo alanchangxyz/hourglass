@@ -7,7 +7,8 @@ import {
   Text,
   useColorScheme,
   View,
-  Button
+  Button,
+  FlatList
 } from 'react-native';
 
 import TaskCard from '../components/TaskCard'
@@ -15,29 +16,14 @@ import { useBackend } from '../util/Backend';
 
 const ScheduleView = ({ navigation }) => {
   const { backend }  = useBackend();
-  const [selectedTask, setSelectedTask] = useState({name: "", duration: 0});
+  const [tasks, setTasks] = useState([]);
+  const [selectedTask, setSelectedTask] = useState({tid: "", name: "", duration: 0});
 
   // TODO: pull tasks from backend and then display all task cards
   const getTasks = async () => {
     const { data : res } = await backend.get('/tasks');
-    return res;
+    setTasks(res);
   };
-
-  const TaskCardsList = props => {
-    let tasks = getTasks();
-    const renderTaskCard  = ({task}) => {
-      return (<TaskCard name={task.name} duration={task.duration} setSelectedTask={setSelectedTask} selectedTask={selectedTask}></TaskCard>)
-    }
-    return
-    (<SafeAreaView>
-      <FlatList
-        data={tasks}
-        renderItem={renderTaskCard}
-        keyExtractor={task => task.tid}
-      />
-    </SafeAreaView>);
-
-  }
 
   useEffect(() => {
     getTasks();
@@ -53,16 +39,12 @@ const ScheduleView = ({ navigation }) => {
             {
               if (selectedTask.name !== "") {
                 navigation.navigate("Choose a Time Range", selectedTask)
-                console.log(selectedTask)
               }
             }
           }
         />
       <ScrollView contentInsetAdjustmentBehavior="automatic">
-        {/* TODO: pull tasks from DB  */}
-        <TaskCard name="Hang out with Parsa" duration={12} selectedTask={selectedTask} setSelectedTask={setSelectedTask}/>
-        <TaskCard name="Coffee chat" duration={30} selectedTask={selectedTask} setSelectedTask={setSelectedTask}/>
-        <TaskCardsList/>
+        {tasks.map(task => <TaskCard name={task.name} duration={task.duration} selectedTask={selectedTask} setSelectedTask={setSelectedTask} tid={task.tid}/>)}
       </ScrollView>
 
     </SafeAreaView>
