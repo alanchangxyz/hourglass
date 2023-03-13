@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableWithoutFeedback } from 'react-native';
+
+import { useAuth } from '../util/Auth';
 import { useBackend } from '../util/Backend';
 
 const styles = StyleSheet.create({
@@ -326,6 +328,7 @@ const RecommendationCard = props => {
 const Home = () => {
   const [calData, setCalData] = useState();
   const { backend } = useBackend();
+  const { changeUser, currentUser } = useAuth();
   useEffect(() => {
     getHomepageCalDataHome(new Date()).then(data => setCalData(data));
   }, []);
@@ -396,7 +399,7 @@ const Home = () => {
 
   return (
     <View>
-      <Header name={'Alan'} />
+      <Header name={currentUser.fname} />
       <DateList setCalendarData={setCalData} />
       <FlatList
         style={styles.eventList}
