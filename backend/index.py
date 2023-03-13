@@ -224,7 +224,7 @@ def tasks_create_one():
 
   try:
     cursor.execute(f'INSERT INTO tasks (uid, name, duration)\
-      VALUES (%s, %s, %d) RETURNING *', (js['uid'], js['name'], js['duration']))
+      VALUES (%s, %s, %s) RETURNING *', (js['uid'], js['name'], js['duration']))
     connection.commit()
     res = cursor.fetchone()
     res['tid'] = str(res['tid'])
