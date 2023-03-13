@@ -28,7 +28,12 @@ def home():
 @app.route('/recommendations', methods=['GET'])
 def recs_get_all():
   cursor.execute('SELECT * from recommendations')
-  return cursor.fetchall()
+  res = cursor.fetchall()
+  for rec in res:
+    rec['rid'] = str(rec['rid'])
+    rec['start_time'] = rec['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    rec['end_time'] = rec['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+  return util.status200(res)
 
 @app.route('/recommendations/<rid>', methods=['GET'])
 def recs_get_one_by_id(rid):
@@ -44,6 +49,9 @@ def recs_get_one_by_id(rid):
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+    res['rid'] = str(res['rid'])
+    res['start_time'] = res['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    res['end_time'] = res['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -63,17 +71,30 @@ def recs_get_all_by_user_and_task(uid, tid):
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+    res['rid'] = str(res['rid'])
+    res['start_time'] = res['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    res['end_time'] = res['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     return util.status200(res)
   except:
     return util.error500("Internal server error")
 
 @app.route('/recommendations/homepage', methods=['GET'])
 def recs_get_homepage():
-  try:
-    cursor.execute(f'SELECT * FROM recommendations r, tasks t WHERE r.chosen = True AND r.added_to_cal = False AND t.tid = r.tid')
-    return cursor.fetchall()
-  except:
-    return util.error500("Internal server error")
+  # try:
+  cursor.execute(f'SELECT * FROM recommendations r, tasks t WHERE r.chosen = True AND r.added_to_cal = False AND t.tid = r.tid')
+  res = cursor.fetchall()
+  for rec in res:
+    rec['rid'] = str(rec['rid'])
+    rec['uid'] = str(rec['uid'])
+    rec['tid'] = str(rec['tid'])
+    rec['start_time'] = rec['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    rec['end_time'] = rec['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    rec['start_range'] = rec['start_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    rec['end_range'] = rec['end_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+
+  return util.status200(res)
+  # except:
+  #   return util.error500("Internal server error")
 
 @app.route('/recommendations', methods=['POST'])
 def recommendations_create_one():
@@ -84,7 +105,11 @@ def recommendations_create_one():
       (start_time, end_time, min_offset, chosen, added_to_cal, uid, tid)\
       VALUES (%s, %s, %d, %d, %s, %s) RETURNING *', (js['start_time'], js['end_time'], js['min_offset'], js['chosen'], js['added_to_cal'], js['uid'], js['tid']))
     connection.commit()
-    return util.status200(cursor.fetchone())
+    res = cursor.fetchone()
+    res['rid'] = str(res['rid'])
+    res['start_time'] = res['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    res['end_time'] = res['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    return util.status200(res)
   except:
     return util.error500("Internal server error")
 
@@ -108,6 +133,9 @@ def recommendations_edit_one(rid):
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+    res['rid'] = str(res['rid'])
+    res['start_time'] = res['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    res['end_time'] = res['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -128,7 +156,7 @@ def recommendations_delete_one(rid):
       return util.status200({'deleted': None})
     cursor.execute(f'DELETE from recommendations WHERE rid = %s', (rid,))
     connection.commit()
-    return util.status200({'deleted': rid})
+    return util.status200({'deleted': str(rid)})
   except:
     return util.error500("Internal server error")
 
@@ -137,7 +165,14 @@ def recommendations_delete_one(rid):
 @app.route('/tasks', methods=['GET'])
 def tasks_get_all():
   cursor.execute('SELECT * from tasks')
-  return cursor.fetchall()
+  res = cursor.fetchall()
+
+  for task in res:
+    task['start_range'] = task['start_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    task['end_range'] = task['end_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    task['tid'] = str(task['tid'])
+
+  return util.status200(res)
 
 @app.route('/tasks/<tid>', methods=['GET'])
 def tasks_get_one_by_id(tid):
@@ -156,6 +191,7 @@ def tasks_get_one_by_id(tid):
 
     res['start_range'] = res['start_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     res['end_range'] = res['end_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+    res['tid'] = str(res['tid'])
 
     return util.status200(res)
   except:
@@ -179,6 +215,7 @@ def tasks_get_all_by_user(uid):
     for task in res:
       task['start_range'] = task['start_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
       task['end_range'] = task['end_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
+      task['tid'] = str(task['tid'])
 
     return util.status200(res)
   except:
@@ -192,7 +229,9 @@ def tasks_create_one():
     cursor.execute(f'INSERT INTO tasks (uid, name, priority, duration, start_range, end_range)\
       VALUES (%s, %s, %d, %d, %s, %s) RETURNING *', (js['uid'], js['name'], js['priority'], js['duration'], js['start_range'], js['end_range']))
     connection.commit()
-    return util.status200(cursor.fetchone())
+    res = cursor.fetchone()
+    res['tid'] = str(res['tid'])
+    return util.status200(res)
   except:
     return util.error500("Internal server error")
 
@@ -216,6 +255,7 @@ def tasks_edit_one(tid):
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+    res['tid'] = str(res['tid'])
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -236,7 +276,7 @@ def tasks_delete_one(tid):
       return util.status200({'deleted': None})
     cursor.execute(f'DELETE from tasks WHERE tid = %s', (tid,))
     connection.commit()
-    return util.status200({'deleted': tid})
+    return util.status200({'deleted': str(tid)})
   except:
     return util.error500("Internal server error")
 
@@ -246,9 +286,13 @@ def tasks_delete_one(tid):
 def users_get_all():
   try:
     cursor.execute('SELECT * from users ORDER BY users.id')
-    return cursor.fetchall()
-  except:
-    return util.error500("Internal server error")
+    res = cursor.fetchall()
+    for row in res:
+      row['id'] = str(row['id'])
+
+    return util.status200(res)
+  except Exception as e:
+    return util.error500(f"Internal server error - {e}")
 
 @app.route('/users/by-id/<uid>', methods=['GET'])
 def users_get_one_by_id(uid):
@@ -264,6 +308,7 @@ def users_get_one_by_id(uid):
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+    res['id'] = str(res['id'])
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -275,6 +320,7 @@ def users_get_one_by_email(email):
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+    res['id'] = str(res['id'])
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -288,7 +334,9 @@ def users_create_one():
   try:
     cursor.execute(f'INSERT INTO users (email, fname, lname) VALUES (%s, %s, %s) RETURNING *', (js['email'], js['fname'], js['lname']))
     connection.commit()
-    return util.status200(cursor.fetchone())
+    res = cursor.fetchone()
+    res['id'] = str(res['id'])
+    return util.status200(res)
   except:
     return util.error500("Internal server error")
 
@@ -311,6 +359,7 @@ def users_edit_one(uid):
     res = cursor.fetchone()
     if not res:
       return util.status200(None)
+    res['id'] = str(res['id'])
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -331,7 +380,7 @@ def users_delete_one(uid):
       return util.status200({'deleted': None})
     cursor.execute(f'DELETE from users WHERE id = %s', (uid,))
     connection.commit()
-    return util.status200({'deleted': uid})
+    return util.status200({'deleted': str(uid)})
   except:
     return util.error500("Internal server error")
 
