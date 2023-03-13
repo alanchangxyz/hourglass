@@ -166,9 +166,8 @@ def tasks_get_all():
   res = cursor.fetchall()
 
   for task in res:
-    task['start_range'] = task['start_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
-    task['end_range'] = task['end_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     task['tid'] = str(task['tid'])
+    task['uid'] = str(task['uid'])
 
   return util.status200(res)
 
@@ -187,9 +186,8 @@ def tasks_get_one_by_id(tid):
     if not res:
       return util.status200(None)
 
-    res['start_range'] = res['start_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
-    res['end_range'] = res['end_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     res['tid'] = str(res['tid'])
+    res['uid'] = str(res['uid'])
 
     return util.status200(res)
   except:
@@ -205,15 +203,14 @@ def tasks_get_all_by_user(uid):
     return util.error400('Invalid user ID supplied')
 
   try:
-    cursor.execute(f'SELECT * from tasks WHERE uid = %s', (uid,))
+    cursor.execute(f'SELECT * from tasks WHERE uid = %s ORDER BY tasks.tid', (uid,))
     res = cursor.fetchall()
     if not res:
       return util.status200(None)
 
     for task in res:
-      task['start_range'] = task['start_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
-      task['end_range'] = task['end_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
       task['tid'] = str(task['tid'])
+      task['uid'] = str(task['uid'])
 
     return util.status200(res)
   except:
@@ -221,14 +218,15 @@ def tasks_get_all_by_user(uid):
 
 @app.route('/tasks', methods=['POST'])
 def tasks_create_one():
-  js = request.get_json() #uid, name, priority, duration, start_range, end_range
+  js = request.get_json() #uid, name, duration
 
   try:
-    cursor.execute(f'INSERT INTO tasks (uid, name, priority, duration, start_range, end_range)\
-      VALUES (%s, %s, %d, %d, %s, %s) RETURNING *', (js['uid'], js['name'], js['priority'], js['duration'], js['start_range'], js['end_range']))
+    cursor.execute(f'INSERT INTO tasks (uid, name, duration)\
+      VALUES (%s, %s, %d) RETURNING *', (js['uid'], js['name'], js['duration']))
     connection.commit()
     res = cursor.fetchone()
     res['tid'] = str(res['tid'])
+    res['uid'] = str(res['uid'])
     return util.status200(res)
   except:
     return util.error500("Internal server error")
@@ -241,12 +239,12 @@ def tasks_edit_one(tid):
     return util.error400('Invalid task ID supplied')
   if not tid or not isinstance(tid, int):
     return util.error400('Invalid task ID supplied')
-  js = request.get_json() #uid, name, priority, duration, start_range, end_range
+  js = request.get_json() #uid, name, duration
 
   try:
     cursor.execute(f'UPDATE tasks\
-      SET name = %s, priority = %s, duration = %d, start_range = %s, end_range = %s WHERE tid = %s',\
-      (js['name'], js['priority'], js['duration'], js['start_range'], js['end_range'], tid)
+      SET uid = %s, name = %s, duration = %d WHERE tid = %s',\
+      (js['uid'], js['name'], js['duration'], tid)
     )
     connection.commit()
     cursor.execute(f'SELECT * from tasks WHERE tid = %s', (tid,))
@@ -254,6 +252,7 @@ def tasks_edit_one(tid):
     if not res:
       return util.status200(None)
     res['tid'] = str(res['tid'])
+    res['uid'] = str(res['uid'])
     return util.status200(res)
   except:
     return util.error500("Internal server error")
