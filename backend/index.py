@@ -89,8 +89,6 @@ def recs_get_homepage():
     rec['tid'] = str(rec['tid'])
     rec['start_time'] = rec['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     rec['end_time'] = rec['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
-    rec['start_range'] = rec['start_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
-    rec['end_range'] = rec['end_range'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
 
   return util.status200(res)
   # except:
