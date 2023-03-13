@@ -36,9 +36,10 @@ def create_time_lists(start_time, end_time, duration, step_size):
 
 def get_recommendations_data(tid):
     df_recs = get_recommendations(tid)
-    start_times = df_recs["start_time"].dt
-    df_recs["start_time"] = ((start_times.hour * 60 + start_times.minute) * 60 + start_times.second)
-    df_recs["chosen"] = df_recs["chosen"].astype(int)
+    if len(df_recs) > 0:
+      start_times = df_recs["start_time"].dt
+      df_recs["start_time"] = ((start_times.hour * 60 + start_times.minute) * 60 + start_times.second)
+      df_recs["chosen"] = df_recs["chosen"].astype(int)
     return df_recs
 
 def generate_step_size(duration, start_range, end_range):
