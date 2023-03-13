@@ -116,11 +116,8 @@ const AddTaskView = ({ navigation, route }) => {
         name: taskName,
         duration: taskDuration
       });
-      // const responseData = response.data;
-      // return responseData;
     } catch (error) {
       console.error(error);
-      // return DATA;
     }
 
     navigation.navigate("Your Tasks");

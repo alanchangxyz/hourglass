@@ -62,11 +62,9 @@ const TasksView = ({navigation}) => {
     try {
       const response = await backend.get(`/tasks/by-user/${currentUser.id}`);
       const responseData = response.data;
-      console.log(responseData);
       return responseData;
     } catch (error) {
       console.error(error);
-      // return DATA;
     }
   };
 
