@@ -27,7 +27,7 @@ const routeMappings = {
   Tasks: {
     name: "Tasks",
     tab: <ListChecks />,
-    component: TasksView,
+    component: TasksTabNavigator,
   },
   Profile: {
     name: "Profile",

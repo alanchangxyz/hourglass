@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
     SafeAreaView,
-    ScrollView,
     FlatList,
     StatusBar,
     StyleSheet,
@@ -9,6 +8,9 @@ import {
     View,
     Button
 } from 'react-native';
+
+import { useAuth } from '../util/Auth';
+import { useBackend } from '../util/Backend';
 
 const styles = StyleSheet.create({
     taskList: {
@@ -38,18 +40,6 @@ const styles = StyleSheet.create({
     }
   });
 
-  async function getTaskData() {
-    try {
-      const response = await fetch(`https://hourglass.alanchang.xyz/api/tasks`);
-      const responseJson = await response.json();
-      console.log(responseJson);
-      return responseJson;
-    } catch (error) {
-      console.error(error);
-      // return DATA;
-    }
-  };
-
 const TaskCard = props => {
     return (
         <View style={styles.taskCard}>
@@ -61,19 +51,31 @@ const TaskCard = props => {
 
 const TasksView = ({navigation}) => {
   const [taskData, setTaskData] = useState();
+  const { backend } = useBackend();
+  const { changeUser, currentUser } = useAuth();
+
   useEffect(() => {
     getTaskData().then(data => setTaskData(data));
-  }, []);
+  });
 
-  const renderTaskCard = ({ item }) => {
-    console.log(item);
-    return (
-      <TaskCard
+  async function getTaskData() {
+    try {
+      const response = await backend.get(`/tasks/by-user/${currentUser.id}`);
+      const responseData = response.data;
+      console.log(responseData);
+      return responseData;
+    } catch (error) {
+      console.error(error);
+      // return DATA;
+    }
+  };
+
+  const renderTaskCard = ({ item }) => (
+    <TaskCard
         name={item.name}
         duration={item.duration}
       />
-    )
-    };
+  );
 
     return (
         <SafeAreaView>
