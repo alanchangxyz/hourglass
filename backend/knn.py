@@ -158,8 +158,3 @@ def get_ranking(tid, start_date, end_date):
     filtered_rankings = filter_by_calendar(unfiltered_rankings, date)
     top_rankings = rankings_top_percent(filtered_rankings, percent = 0.20)
     return convert_to_json(top_rankings)
-
-
-if __name__ == "__main__":
-    rankings = get_ranking(tid = 845422236096167937, start_date = "03/08/2023 12:00:00", end_date = "03/08/2023 14:00:00")
-    print(rankings)
