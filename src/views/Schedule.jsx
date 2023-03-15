@@ -3,25 +3,22 @@ import {
   SafeAreaView,
   ScrollView,
   StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-  Button,
-  FlatList
+  Button
 } from 'react-native';
 
 import TaskCard from '../components/TaskCard'
 import { useBackend } from '../util/Backend';
+import { useAuth } from '../util/Auth'
 
 const ScheduleView = ({ navigation }) => {
   const { backend }  = useBackend();
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState({tid: "", name: "", duration: 0});
+  const { currentUser } = useAuth();
 
   // TODO: pull tasks from backend and then display all task cards
   const getTasks = async () => {
-    const { data : res } = await backend.get('/tasks');
+    const { data : res } = await backend.get(`/tasks/by-user/${currentUser.id}`);
     setTasks(res);
   };
 
