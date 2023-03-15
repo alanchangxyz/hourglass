@@ -99,9 +99,9 @@ def recommendations_create_one():
   js = request.get_json() #start_time, #end_time, min_offset, chosen, added_to_cal, uid, tid
 
   try:
-    cursor.execute(f'INSERT INTO recommenations\
+    cursor.execute(f'INSERT INTO recommendations\
       (start_time, end_time, min_offset, chosen, added_to_cal, uid, tid)\
-      VALUES ((TIMESTAMP %s), (TIMESTAMP %s), %d, %d, %s, %s) RETURNING *', (js['start_time'], js['end_time'], js['min_offset'], js['chosen'], js['added_to_cal'], js['uid'], js['tid']))
+      VALUES ((TIMESTAMP %s), (TIMESTAMP %s), %s, %s, %s, %s, %s) RETURNING *', (js['start_time'], js['end_time'], js['min_offset'], js['chosen'], js['added_to_cal'], js['uid'], js['tid']))
     connection.commit()
     res = cursor.fetchone()
     res['rid'] = str(res['rid'])
