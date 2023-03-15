@@ -7,9 +7,9 @@ import {
     Text,
     useColorScheme,
     View,
-    Button
+    Button,
 } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
+import { useFocusEffect} from '@react-navigation/native';
 
 import { ScheduleCard, styles, convertMilitaryTime} from '../utils/utils'
 import { useBackend } from '../util/Backend';
@@ -21,7 +21,6 @@ const SchedulePickTimeSlotView = ({navigation, route}) => {
     const {taskName, taskDuration, timeRangeStart, timeRangeEnd, date, tid} = route.params;
     const [rankedRecommendations, setRankedRecommendations] = useState([]);
     const [selectedTime, setSelectedTime] = useState({});
-    const isFocused = useIsFocused();
     const { backend }  = useBackend();
 
     // console.log(date)
@@ -67,12 +66,24 @@ const SchedulePickTimeSlotView = ({navigation, route}) => {
         })
     }
 
-    useEffect(() => {
-        console.log('use effect is running');
+    // useEffect(() => {
+    //     const retrieveRecommendations = navigation.addListener('focus', () => {
+    //         console.log('use effect is running');
         
-            getRecommendations();
-        
-    }, []);
+    //         getRecommendations();
+    //     })
+    //     return retrieveRecommendations
+    // }, [navigation]);
+    useFocusEffect(
+        React.useCallback(() => {
+            const retrieveRecommendations = navigation.addListener('focus', () => {
+                console.log('use effect is running');
+            
+                getRecommendations();
+            })
+            return retrieveRecommendations;
+        }, [rankedRecommendations, selectedTime])
+      );
     // getRecommendations();
 
     return selectedTime !== {} && (
