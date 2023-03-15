@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     SafeAreaView,
-    ScrollView,
+    FlatList,
     StatusBar,
     StyleSheet,
     Text,
-    useColorScheme,
     View,
+    Button
 } from 'react-native';
 
+import { useAuth } from '../util/Auth';
+import { useBackend } from '../util/Backend';
+
 const styles = StyleSheet.create({
-    scrollArea: {
+    taskList: {
         height: '100%',
         backgroundColor:'#FFFFFF',
         alignItems: 'center',
         paddingVertical: 15
     },
-    card: {
+    taskCard: {
         width: '90%',
         height: 72,
         backgroundColor: '#E6E6E6',
@@ -39,23 +42,55 @@ const styles = StyleSheet.create({
 
 const TaskCard = props => {
     return (
-        <View style={styles.card}>
+        <View style={styles.taskCard}>
             <Text style={styles.taskName}>{props.name}</Text>
             <Text style={styles.taskDuration}>{props.duration} {props.duration == 1 ? "minute" : "minutes"}</Text>
         </View>
     )
 }
 
-const Tasks = () => {
+const TasksView = ({navigation}) => {
+  const [taskData, setTaskData] = useState();
+  const { backend } = useBackend();
+  const { changeUser, currentUser } = useAuth();
+
+  useEffect(() => {
+    getTaskData().then(data => setTaskData(data));
+  });
+
+  async function getTaskData() {
+    try {
+      const response = await backend.get(`/tasks/by-user/${currentUser.id}`);
+      const responseData = response.data;
+      return responseData;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const renderTaskCard = ({ item }) => (
+    <TaskCard
+        name={item.name}
+        duration={item.duration}
+      />
+  );
+
     return (
         <SafeAreaView>
             <StatusBar />
-            <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.scrollArea}>
-                <TaskCard name="Hang out with Parsa" duration={12}/>
-                <TaskCard name="Your mom" duration={1}/>
-            </ScrollView>
+            <Button
+                title="Add Task"
+                onPress={() =>
+                    navigation.navigate("Add a Task")
+                }
+            />
+            <FlatList
+              contentContainerStyle={styles.taskList}
+              data={taskData}
+              renderItem={renderTaskCard}
+              keyExtractor={item => item.tid} />
         </SafeAreaView>
     );
 };
 
-export default Tasks;
+export default TasksView;

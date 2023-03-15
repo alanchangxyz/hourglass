@@ -10,7 +10,7 @@ import { BackendProvider } from './src/util/Backend';
 // Views
 import HomeView from './src/views/Home';
 import ScheduleView from './src/views/Schedule';
-import TasksView from './src/views/Tasks';
+import TasksTabNavigator from './src/navigators/TasksTab';
 import ProfileView from './src/views/Profile';
 
 const routeMappings = {
@@ -27,7 +27,7 @@ const routeMappings = {
   Tasks: {
     name: "Tasks",
     tab: <ListChecks />,
-    component: TasksView,
+    component: TasksTabNavigator,
   },
   Profile: {
     name: "Profile",
