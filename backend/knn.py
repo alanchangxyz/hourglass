@@ -145,11 +145,6 @@ def rankings_top_percent(rankings, percent):
     num_recs = int(len(rankings) * percent)
     return [rankings[i] for i in range(num_recs)]
 
-def format_rankings(rankings, date, timezone):
-    date = date.replace("-", "/")
-    for i in range(len(rankings)):
-        start_time, end_time = rankings[i]
-        rankings[i] = (f"{date} {start_time} {timezone}", f"{date} {end_time} {timezone}")
 
 def get_ranking(tid, start_date, end_date):
     date, start_range = start_date.split(" ")
@@ -157,5 +152,4 @@ def get_ranking(tid, start_date, end_date):
     unfiltered_rankings = get_unfiltered_ranking(tid, start_range, end_range)
     filtered_rankings = filter_by_calendar(unfiltered_rankings, date)
     top_rankings = rankings_top_percent(filtered_rankings, percent = 0.20)
-    format_rankings(top_rankings, date, timezone = "PST")
     return convert_to_json(top_rankings)
