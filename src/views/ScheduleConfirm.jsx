@@ -13,7 +13,7 @@ import { styles, convertMilitaryTime} from '../utils/utils'
 const ScheduleConfirmView = ({navigation, route}) => {
   console.log(route.params)
 
-  const {selectedStartTime, selectedEndTime, taskName, taskDuration} = route.params
+  const {selectedStartTime, selectedEndTime, tid} = route.params
 
   const addConfirmedTasktoDB = () =>{
     // TODO: ADD TO DATABASE

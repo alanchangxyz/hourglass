@@ -17,18 +17,17 @@ const ScheduleTimeRangeView = ({navigation, route}) => {
     const [timeRangeStart, setTimeRangeStart] = useState(new Date())
     const [timeRangeEnd, setTimeRangeEnd] = useState(new Date())
 
-    const [date, setDate] = useState(new Date())
     const { backend }  = useBackend();
 
     const getRecommendations = async () => {
         
-        var parsedDate = parseDate(date.toLocaleDateString("en-US", {timeZone: "America/Los_Angeles"}));
+        var parsedDate = parseDate(timeRangeStart.toLocaleDateString("en-US", {timeZone: "America/Los_Angeles"}));
         var parsedTimeRangeStart = parseTime(timeRangeStart.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
         var parsedTimeRangeEnd = parseTime(timeRangeEnd.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
         
         const res = await backend.get(`/recommendations/generate/${tid}/${parsedDate}/${parsedTimeRangeStart}/${parsedTimeRangeEnd}`);
-        
-        navigation.navigate('Choose a Time Slot', res.data)
+        const params = {date: timeRangeStart.toLocaleDateString("en-US", {timeZone: "America/Los_Angeles"}), rankedRecommendations: res.data, tid:tid}
+        navigation.navigate('Choose a Time Slot', params)
     };
 
     return (
@@ -36,18 +35,13 @@ const ScheduleTimeRangeView = ({navigation, route}) => {
             <StatusBar />
             <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.scrollArea}>
                 <Text style={styles.fieldTitle}>When would you like this task to be scheduled? </Text>
-                <Text>Date</Text>
-                <DatePicker date={date} onDateChange={setDate} mode="date"></DatePicker>
-                <View style={styles.timeSelectorContainer}>
-                    <View>
-                        <Text style={styles.timeSelectorTitle}>As early as:</Text>
-                        <DatePicker date={timeRangeStart} onDateChange={setTimeRangeStart} mode="time" />
-                    </View>
-                    <View>
-                        <Text style={styles.timeSelectorTitle}>As late as: </Text>   
-                        <DatePicker date={timeRangeEnd} onDateChange={setTimeRangeEnd} mode="time" />
-                    </View>
-                </View>
+
+                <Text style={styles.timeSelectorTitle}>As early as:</Text>
+                <DatePicker date={timeRangeStart} onDateChange={setTimeRangeStart} mode="datetime"></DatePicker>
+
+                <Text style={styles.timeSelectorTitle}>As late as:</Text>
+                <DatePicker date={timeRangeEnd} onDateChange={setTimeRangeEnd} mode="datetime"></DatePicker>
+                
                 
                 <Button
                     title="Next"

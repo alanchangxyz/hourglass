@@ -1,43 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     SafeAreaView,
     ScrollView,
     StatusBar,
-    StyleSheet,
     Text,
-    useColorScheme,
     View,
     Button,
 } from 'react-native';
 
 import {  styles, convertMilitaryTime} from '../utils/utils'
+import { useBackend } from '../util/Backend';
+import { useAuth } from '../util/Auth';
 import { ScheduleCard } from '../components/ScheduleCard';
 
 
 const SchedulePickTimeSlotView = ({navigation, route}) => {
-    console.log('Route params', route.params)
-
-    const rankedRecommendations = route.params;
-    console.log(rankedRecommendations)
+    
+    const {rankedRecommendations, tid, date} = route.params;
+    
     const [selectedTime, setSelectedTime] = useState(rankedRecommendations[0])
-
-    // const ranked_recommendations = [{startTime: "11:00:00", endTime: "11:30:00"}, 
-    //                           {startTime: "11:15:00", endTime: "11:45:00"},
-    //                           {startTime: "11:30:00", endTime: "12:00:00"},
-    //                           {startTime: "13:00:00", endTime: "13:30:00"},
-    //                           {startTime: "13:15:00", endTime: "13:45:00"}]
-
     
     const [page, setPage] = useState(1)
 
-    const confirmation = () => {
-        rankedRecommendations.forEach( (rec) => {
+    const { currentUser } = useAuth();
+    const { backend } = useBackend(); 
+
+    const confirmation = async () => {
+        rankedRecommendations.forEach( async (rec) => {
             if (rec.startTime !== selectedTime.startTime) {
                 // post recommendation to database
-                console.log()
+                postRecommendation(rec);  
             } 
-            navigation.navigate("Your Task Has Been Scheduled", {selectedStartTime: selectedTime.startTime, selectedEndTime: selectedTime.endTime, taskName: taskName, taskDuration: taskDuration})
+            navigation.navigate("Your Task Has Been Scheduled", {selectedStartTime: selectedTime.startTime, selectedEndTime: selectedTime.endTime, tid:tid, date: date})
         })
+    }
+
+    const postRecommendation = async (rec) => {
+        var data = {uid: currentUser.id, tid: tid, added_to_cal: false, chosen: false, min_offset: 0,
+            start_time: `${date} ${rec.startTime} PST`, end_time: `${date} ${rec.endTime} PST`};
+        console.log(date)
+        try {
+            const response = await backend.post(`/recommendations`, data)
+            console.log(`Recommendations posted for ${tid}`)
+        } catch (error) {
+            console.error(error)
+        }
+        
     }
 
     return (
