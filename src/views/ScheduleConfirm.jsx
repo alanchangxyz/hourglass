@@ -19,14 +19,14 @@ const ScheduleConfirmView = ({navigation, route}) => {
 
   const {date, selectedStartTime, selectedEndTime, tid} = route.params
 
-  const confirmWithGCal = () => {
-    // await postRecommendation(true);
-    // addConfirmedTasktoGCal();
+  const confirmWithGCal = async () => {
+    await postRecommendation(true);
+    addConfirmedTasktoGCal();
     navigation.navigate("Home")
   }
 
-  const confirmWithOutGCal = () => {
-    // await postRecommendation(false);
+  const confirmWithOutGCal = async () => {
+    await postRecommendation(false);
     navigation.navigate("Home")
   }
 
