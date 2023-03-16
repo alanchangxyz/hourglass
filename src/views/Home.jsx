@@ -9,6 +9,14 @@ const styles = StyleSheet.create({
     fontSize: 36,
     color: 'black',
     lineHeight: 44,
+    marginLeft: 14,
+    marginTop: 10,
+  },
+  subhead: {
+    marginLeft: 15,
+    marginTop: 3,
+    marginBottom: 10,
+    fontSize: 16,
   },
   eventList: {
     height: '70%',
@@ -159,7 +167,7 @@ const Header = props => {
   return (
     <View>
       <Text style={styles.headerName}>Hello {props.name},</Text>
-      <Text>Check out your daily schedules:</Text>
+      <Text style={styles.subhead}>Check out your daily schedules:</Text>
     </View>
   );
 };

@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
     },
     taskCard: {
         width: '90%',
+        minWidth: 300,
         height: 72,
         backgroundColor: '#E6E6E6',
         borderRadius: 10,
@@ -79,16 +80,17 @@ const TasksView = ({navigation}) => {
         <SafeAreaView>
             <StatusBar />
             <Button
-                title="Add Task"
-                onPress={() =>
-                    navigation.navigate("Add a Task")
-                }
+              title="Add Task"
+              onPress={() =>
+                  navigation.navigate("Add a Task")
+              }
             />
             <FlatList
               contentContainerStyle={styles.taskList}
               data={taskData}
               renderItem={renderTaskCard}
-              keyExtractor={item => item.tid} />
+              keyExtractor={item => item.tid}
+            />
         </SafeAreaView>
     );
 };
