@@ -8,17 +8,49 @@ import {
   Button
 } from 'react-native';
 
-import { styles, convertMilitaryTime} from '../utils/utils'
+import { styles, convertMilitaryTime, parseDate} from '../utils/utils'
+import { useBackend } from '../util/Backend';
+import { useAuth } from '../util/Auth';
 
 const ScheduleConfirmView = ({navigation, route}) => {
-  console.log(route.params)
 
-  const {selectedStartTime, selectedEndTime, tid} = route.params
+  const { currentUser } = useAuth();
+  const { backend } = useBackend(); 
 
-  const addConfirmedTasktoDB = () =>{
-    // TODO: ADD TO DATABASE
+  const {date, selectedStartTime, selectedEndTime, tid} = route.params
+
+  const confirmWithGCal = () => {
+    // await postRecommendation(true);
+    // addConfirmedTasktoGCal();
     navigation.navigate("Home")
   }
+
+  const confirmWithOutGCal = () => {
+    // await postRecommendation(false);
+    navigation.navigate("Home")
+  }
+
+  const addConfirmedTasktoGCal = () => {
+    // TODO: add to gcal
+  }
+
+  const postRecommendation = async ( added_to_cal) => {
+    var data = 
+    {
+        uid: currentUser.id, 
+        tid: tid, 
+        added_to_cal: added_to_cal, 
+        chosen: true, 
+        min_offset: 0,
+        start_time: `${parseDate(date, false)} ${selectedStartTime}`, 
+        end_time: `${parseDate(date, false)} ${selectedEndTime}`};
+    try {
+        const response = await backend.post(`/recommendations`, data)
+    } catch (error) {
+        console.error("error: " + error)
+    }
+    
+}
 
   return (
     <SafeAreaView>
@@ -28,8 +60,8 @@ const ScheduleConfirmView = ({navigation, route}) => {
         <Text style={styles.fieldTitle}> {convertMilitaryTime(selectedStartTime)} - {convertMilitaryTime(selectedEndTime)}</Text>
         <Text style={styles.fieldTitle}> Would you like to add this event to your Google Calendar? </Text>
         <View style={styles.childView}> 
-            <Button title="Later" onPress={addConfirmedTasktoDB} style={styles.validButton}/>
-            <Button title="Yes" onPress={addConfirmedTasktoDB} style={styles.validButton}/>
+            <Button title="Later" onPress={confirmWithOutGCal} style={styles.validButton}/>
+            <Button title="Yes" onPress={confirmWithGCal} style={styles.validButton}/>
         </View>
         </ScrollView>
         </SafeAreaView>

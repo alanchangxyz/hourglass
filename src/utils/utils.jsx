@@ -117,7 +117,7 @@ export function convertMilitaryTime(time) {
     return hour.toString() + ":" + minute.toString() + ampm
 }
 
-export function parseDate(string) {
+export function parseDate(string, display) {
     var parts_of_date = string.split("/")
     var month = parts_of_date[0] 
     var day = parts_of_date[1]
@@ -127,7 +127,12 @@ export function parseDate(string) {
     if (day.length == 1) {
         day = "0" + day
     }
-    return month + "-" + day + "-" + parts_of_date[2]
+    if (display) {
+        return month + "-" + day + "-" + parts_of_date[2]
+    } else {
+        return parts_of_date[2] + '-' + month + '-' + day
+    }
+    
 }
 
 export function parseTime(string) {

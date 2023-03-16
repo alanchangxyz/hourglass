@@ -21,7 +21,7 @@ const ScheduleTimeRangeView = ({navigation, route}) => {
 
     const getRecommendations = async () => {
         
-        var parsedDate = parseDate(timeRangeStart.toLocaleDateString("en-US", {timeZone: "America/Los_Angeles"}));
+        var parsedDate = parseDate(timeRangeStart.toLocaleDateString("en-US", {timeZone: "America/Los_Angeles"}), true);
         var parsedTimeRangeStart = parseTime(timeRangeStart.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
         var parsedTimeRangeEnd = parseTime(timeRangeEnd.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
         

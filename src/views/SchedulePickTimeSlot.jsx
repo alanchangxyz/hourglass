@@ -8,7 +8,7 @@ import {
     Button,
 } from 'react-native';
 
-import {  styles, convertMilitaryTime} from '../utils/utils'
+import {  styles, convertMilitaryTime, parseDate} from '../utils/utils'
 import { useBackend } from '../util/Backend';
 import { useAuth } from '../util/Auth';
 import { ScheduleCard } from '../components/ScheduleCard';
@@ -29,22 +29,34 @@ const SchedulePickTimeSlotView = ({navigation, route}) => {
         rankedRecommendations.forEach( async (rec) => {
             if (rec.startTime !== selectedTime.startTime) {
                 // post recommendation to database
-                postRecommendation(rec);  
+                await postRecommendation(rec);  
             } 
             navigation.navigate("Your Task Has Been Scheduled", {selectedStartTime: selectedTime.startTime, selectedEndTime: selectedTime.endTime, tid:tid, date: date})
         })
     }
 
     const postRecommendation = async (rec) => {
-        var data = {uid: currentUser.id, tid: tid, added_to_cal: false, chosen: false, min_offset: 0,
-            start_time: `${date} ${rec.startTime} PST`, end_time: `${date} ${rec.endTime} PST`};
-        console.log(date)
-        try {
-            const response = await backend.post(`/recommendations`, data)
-            console.log(`Recommendations posted for ${tid}`)
-        } catch (error) {
-            console.error(error)
-        }
+        
+        var data = 
+        {
+            uid: currentUser.id, 
+            tid: tid, 
+            added_to_cal: false, 
+            chosen: false, 
+            min_offset: 0,
+            start_time: `${parseDate(date, false)} ${rec.startTime}`, 
+            end_time: `${parseDate(date, false)} ${rec.endTime}`
+        };
+        console.log(JSON.stringify(data))
+        
+        setTimeout(async () => {
+            try {
+                    const response = await backend.post(`/recommendations`, data)
+            } catch (error) {
+                console.error("error: " + error)
+            }
+        }, 300) 
+                
         
     }
 
