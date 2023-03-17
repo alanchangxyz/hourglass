@@ -392,8 +392,8 @@ def finishAuth():
   return save_credentials()
 
 # Google Calendar Get Events at Date
-@app.route('/calendar/<date>', methods=['GET'])
-def calendar_get_one(date):
+@app.route('/calendar/<email>/<date>', methods=['GET'])
+def calendar_get_one(email, date):
   try:
     dt = datetime.strptime(date, "%m-%d-%Y")
   except:
@@ -403,7 +403,7 @@ def calendar_get_one(date):
   pst_time = pytz.timezone("America/Los_Angeles")
   start_date_utc = pst_time.localize(start_date_pst, is_dst=None).astimezone(pytz.utc).isoformat().replace("+00:00", "Z")
   end_date_utc = pst_time.localize(end_date_pst, is_dst=None).astimezone(pytz.utc).isoformat().replace("+00:00", "Z")
-  return request_events(start_date_utc, end_date_utc)
+  return request_events(start_date_utc, end_date_utc, email)
 
 # Generate Recommendation List
 @app.route('/recommendations/generate/<tid>/<date>/<time1>/<time2>', methods=['GET'])

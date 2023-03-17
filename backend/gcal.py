@@ -34,23 +34,30 @@ def save_credentials():
   # Use authorisation code to request credentials from Google
   flow.fetch_token(authorization_response=authorization_response)
   credentials = flow.credentials
-  with open(os.getenv('GCAL_TOKEN'), 'w') as token:
-    token.write(credentials.to_json())
 
-  # Deep Link Redirect
+  # Get user email for deeplink
+  email = build('oauth2', 'v2', credentials=credentials).userinfo().get().execute().get("email")
+  deeplink = f"hourglass://profile/{email}"
+
+  # Check if previous token file exists
   creds = None
-  deeplink = None
-  if os.path.exists(os.getenv('GCAL_TOKEN')):
-    creds = Credentials.from_authorized_user_file(os.getenv('GCAL_TOKEN'), SCOPES)
-    email = build('oauth2', 'v2', credentials=creds).userinfo().get().execute().get("email")
-    deeplink = f"hourglass://profile/{email}"
+  if os.path.exists(f"{email}_{os.getenv('GCAL_TOKEN')}"):
+    creds = Credentials.from_authorized_user_file(f"{email}_{os.getenv('GCAL_TOKEN')}", SCOPES)
 
-  return redirect(deeplink) if creds else util.status200({'status': 'Success!'})
+  # Refresh token if needed
+  if creds and creds.expired and creds.refresh_token:
+    creds.refresh(Request())
+  # Create new token
+  elif not creds:
+    with open(f"{email}_{os.getenv('GCAL_TOKEN')}", 'w') as token:
+      token.write(credentials.to_json())
 
-def request_events(start_time, end_time):
+  return redirect(deeplink) if deeplink else util.status200({'status': 'Success!'})
+
+def request_events(start_time, end_time, email):
     creds = None
-    if os.path.exists(os.getenv('GCAL_TOKEN')):
-        creds = Credentials.from_authorized_user_file(os.getenv('GCAL_TOKEN'), SCOPES)
+    if os.path.exists(f"{email}_{os.getenv('GCAL_TOKEN')}"):
+        creds = Credentials.from_authorized_user_file(f"{email}_{os.getenv('GCAL_TOKEN')}", SCOPES)
     try:
         service = build('calendar', 'v3', credentials=creds)
         events = service.events().list(calendarId='primary', timeMin=start_time,
