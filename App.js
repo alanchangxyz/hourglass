@@ -1,4 +1,5 @@
 import React from 'react';
+import { ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { House, ListChecks, ListDashes, UserCircle } from 'phosphor-react-native';
@@ -39,11 +40,18 @@ const routeMappings = {
 // Navigation Tab
 const Tab = createBottomTabNavigator();
 
+const linking = {
+  prefixes: ['hourglass://']
+};
+
 const App = () => {
   return (
     <BackendProvider>
       <AuthProvider>
-        <NavigationContainer>
+        <NavigationContainer
+        linking={linking}
+        fallback={<ActivityIndicator color="blue" size="large" />}
+        >
           <Tab.Navigator
             initialRouteName="Home"
             backBehavior="order"
