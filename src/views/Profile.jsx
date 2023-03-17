@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   Alert,
   Button,
@@ -13,7 +13,7 @@ import {
   View,
 } from 'react-native';
 
-import { ALANS_EMAIL, OLIVIAS_EMAIL } from '@env';
+import { REACT_APP_API_URL_PROD } from '@env';
 import { useAuth } from '../util/Auth';
 import { useBackend } from '../util/Backend';
 
@@ -23,24 +23,23 @@ const styles = StyleSheet.create({
   },
 });
 
-const SwitchUserButton = ({ url, switchUser, children }) => {
+const SwitchUserButton = ({ url, children }) => {
   const handlePress = useCallback(async () => {
-    console.log('BEFORE OPEN');
-    await Linking.openURL(url);
-    console.log('AFTER OPEN');
-    switchUser();
+    Linking.openURL(url);
   }, [url]);
 
   return <Button title={children} onPress={handlePress} />;
 };
 
-const Profile = () => {
+const Profile = ({ route }) => {
   const { changeUser, currentUser } = useAuth();
-
-  const changeCurrUser = () => {
-    console.log('SWITCHING USER');
-    changeUser(currentUser?.email === ALANS_EMAIL ? OLIVIAS_EMAIL : ALANS_EMAIL);
-  };
+  const params = route.params || {};
+  console.log(params.email);
+  useEffect(() => {
+    if (params.email && params.email != currentUser) {
+      changeUser(params.email);
+    }
+  }, [params]);
 
   return (
     <View style={styles.profileContainer}>
@@ -72,11 +71,7 @@ const Profile = () => {
         </Text>
       </View>
       <View style={{ marginLeft: '25%', marginRight: '25%', marginTop: 10 }}>
-        <SwitchUserButton
-          url={'https://hourglass.alanchang.xyz/api/authorize'}
-          switchUser={() => changeCurrUser()}>
-          Switch User
-        </SwitchUserButton>
+        <SwitchUserButton url={`${REACT_APP_API_URL_PROD}/authorize`}>Switch User</SwitchUserButton>
       </View>
     </View>
   );

@@ -296,7 +296,7 @@ const Home = () => {
   const { changeUser, currentUser } = useAuth();
   useEffect(() => {
     getHomepageCalDataHome(new Date()).then(data => setCalData(data));
-  }, []);
+  }, [currentUser]);
 
   async function getHomepageCalDataHome(date) {
     // Get the homepage data

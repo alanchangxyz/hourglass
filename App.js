@@ -41,7 +41,15 @@ const routeMappings = {
 const Tab = createBottomTabNavigator();
 
 const linking = {
-  prefixes: ['hourglass://']
+  prefixes: ['hourglass://'],
+  config: {
+    initialRouteName: 'Profile',
+    screens: {
+      Profile: {
+        path: 'profile/:email'
+      }
+    }
+  }
 };
 
 const App = () => {
