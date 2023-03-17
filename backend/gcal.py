@@ -11,7 +11,7 @@ from googleapiclient.errors import HttpError
 
 import util
 
-SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+SCOPES = ['https://www.googleapis.com/auth/calendar.readonly', 'https://www.googleapis.com/auth/userinfo.email']
 SUCCESS_MESSAGE = "Hourglass has successfully connected to your Google Calendar"
 
 
@@ -26,7 +26,7 @@ def credential_authorization():
     return redirect(authorization_url)
 
 def save_credentials():
-  flow = InstalledAppFlow.from_client_secrets_file(os.getenv('GCAL_CREDS'), SCOPES)
+  flow = InstalledAppFlow.from_client_secrets_file(os.getenv('GCAL_CREDS'), scopes = None)
   rdLink = url_for('finishAuth', _external=True)
   flow.redirect_uri = os.getenv('API_URL') + '/' + rdLink[rdLink.find('finishAuth'):]
 
@@ -36,7 +36,16 @@ def save_credentials():
   credentials = flow.credentials
   with open(os.getenv('GCAL_TOKEN'), 'w') as token:
     token.write(credentials.to_json())
-  return util.status200({'status': 'Success!'})
+
+  # Deep Link Redirect
+  creds = None
+  deeplink = None
+  if os.path.exists(os.getenv('GCAL_TOKEN')):
+    creds = Credentials.from_authorized_user_file(os.getenv('GCAL_TOKEN'), SCOPES)
+    email = build('oauth2', 'v2', credentials=creds).userinfo().get().execute().get("email")
+    deeplink = f"hourglass://profile/{email}"
+
+  return redirect(deeplink) if creds else util.status200({'status': 'Success!'})
 
 def request_events(start_time, end_time):
     creds = None
