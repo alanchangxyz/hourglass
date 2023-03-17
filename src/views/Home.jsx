@@ -174,6 +174,8 @@ const Header = props => {
 
 const DateCard = props => {
   const { backend } = useBackend();
+  const { changeUser, currentUser } = useAuth();
+
   async function onSelectDateCard() {
     // Update the DateCard that is highlighted
     props.updateFocused();
@@ -185,7 +187,7 @@ const DateCard = props => {
     let responseCalData = [];
     let responseRecFiltered = [];
     try {
-      const responseCal = await backend.get(`/calendar/${date}`);
+      const responseCal = await backend.get(`/calendar/${currentUser.email}/${date}`);
       responseCalData = responseCal.data;
     } catch (error) {
       console.error(error);
@@ -312,7 +314,8 @@ const Home = () => {
     let responseCalData = [];
     let responseRecFiltered = [];
     try {
-      const responseCal = await backend.get(`/calendar/${date}`);
+      console.log(`/calendar/${currentUser.email}/${date}`);
+      const responseCal = await backend.get(`/calendar/${currentUser.email}/${date}`);
       responseCalData = responseCal.data;
     } catch (error) {
       console.error(error);

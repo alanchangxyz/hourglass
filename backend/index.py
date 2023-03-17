@@ -429,7 +429,10 @@ def recommendations_generate(tid, date, time1, time2):
   if dt1 >= dt2:
     return util.error400('Invalid window for datetimes supplied')
 
-  return get_ranking(tid, datetime1, datetime2)
+  cursor.execute(f'SELECT u.email FROM users u, tasks t WHERE tid = %s AND u.id = t.uid', (tid,))
+  res = cursor.fetchone()
+
+  return get_ranking(tid, datetime1, datetime2, res["email"])
 
 if __name__ == '__main__':
   if os.getenv('DEV_ENV') == 'production':

@@ -99,21 +99,21 @@ def convert_to_json(ranking):
 
     return json.dumps(rankingsList)
 
-def get_calendar_data(date):
+def get_calendar_data(date, email):
   start_date_pst = datetime.strptime(f"{date} 00:00:00","%m-%d-%Y %H:%M:%S")
   end_date_pst = datetime.strptime(f"{date} 00:00:00","%m-%d-%Y %H:%M:%S")+ timedelta(days = 1)
   pst_time = pytz.timezone("America/Los_Angeles")
   start_date_utc = pst_time.localize(start_date_pst, is_dst=None).astimezone(pytz.utc).isoformat().replace("+00:00", "Z")
   end_date_utc = pst_time.localize(end_date_pst, is_dst=None).astimezone(pytz.utc).isoformat().replace("+00:00", "Z")
-  return request_events(start_date_utc, end_date_utc)
+  return request_events(start_date_utc, end_date_utc, email)
 
-def filter_by_calendar(unfiltered_rankings, date):
+def filter_by_calendar(unfiltered_rankings, date, email):
     # minutes scheduled
     minutes_scheduled = set()
 
     # Date in the format M/D/YEAR
     date = date.replace("/", "-")
-    body = get_calendar_data(date)
+    body = get_calendar_data(date, email)
     for item in body:
         start_hour, start_minute, _ = item["start"]["dateTime"].split("T")[1].split("-")[0].split(":")
         scheduled_start_minutes = int(start_hour) * 60 + int(start_minute)
@@ -146,10 +146,10 @@ def rankings_top_percent(rankings, percent):
     return [rankings[i] for i in range(num_recs)]
 
 
-def get_ranking(tid, start_date, end_date):
+def get_ranking(tid, start_date, end_date, email = "pkaramat@uci.edu"):
     date, start_range = start_date.split(" ")
     _, end_range = end_date.split(" ")
     unfiltered_rankings = get_unfiltered_ranking(tid, start_range, end_range)
-    filtered_rankings = filter_by_calendar(unfiltered_rankings, date)
+    filtered_rankings = filter_by_calendar(unfiltered_rankings, date, email)
     top_rankings = rankings_top_percent(filtered_rankings, percent = 0.20)
     return convert_to_json(top_rankings)
