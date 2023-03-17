@@ -1,83 +1,51 @@
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
   StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
+  Button
 } from 'react-native';
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+import TaskCard from '../components/TaskCard'
+import { useBackend } from '../util/Backend';
+import { useAuth } from '../util/Auth'
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const ScheduleView = ({ navigation }) => {
+  const { backend }  = useBackend();
+  const [tasks, setTasks] = useState([]);
+  const [selectedTask, setSelectedTask] = useState({tid: "", name: "", duration: 0});
+  const { currentUser } = useAuth();
 
-/* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
- * LTI update could not be added via codemod */
-// const Section = ({children, title}): Node => {
-const Section = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
+  // TODO: pull tasks from backend and then display all task cards
+  const getTasks = async () => {
+    const { data : res } = await backend.get(`/tasks/by-user/${currentUser.id}`);
+    setTasks(res);
+  };
+
+  useEffect(() => {
+    getTasks();
+  }, []);
+
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
+    <SafeAreaView>
+      <StatusBar />
+      {/* TODO: next button should be fixed at bottom and scroll area should be above that*/}
+      <Button
+          title="Next"
+          onPress={() =>
+            {
+              if (selectedTask.name !== "") {
+                navigation.navigate("Choose a Time Range", selectedTask)
+              }
+            }
+          }
+        />
+      <ScrollView contentInsetAdjustmentBehavior="automatic">
+        {tasks.map(task => <TaskCard name={task.name} duration={task.duration} selectedTask={selectedTask} setSelectedTask={setSelectedTask} tid={task.tid}/>)}
+      </ScrollView>
+
+    </SafeAreaView>
   );
 };
 
-const Schedule = () => {
-  const [name, setName] = useState('user');
-
-  return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Text>Try editing me! 🎉</Text>
-      </View>
-    );
-};
-
-export default Schedule;
+export default ScheduleView;

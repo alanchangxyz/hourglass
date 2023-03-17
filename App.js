@@ -10,9 +10,15 @@ import { BackendProvider } from './src/util/Backend';
 
 // Views
 import HomeView from './src/views/Home';
-import ScheduleView from './src/views/Schedule';
+import ScheduleTabNavigator from './src/navigators/ScheduleTab';
 import TasksTabNavigator from './src/navigators/TasksTab';
 import ProfileView from './src/views/Profile';
+import ScheduleView from './src/views/Schedule';
+
+const home = "Home";
+const schedule = "Schedule";
+const tasks = "Tasks";
+const profile = "Profile";
 
 const routeMappings = {
   Home: {
@@ -23,7 +29,8 @@ const routeMappings = {
   Schedule: {
     name: "Schedule",
     tab: <ListDashes />,
-    component: ScheduleView,
+    component: ScheduleTabNavigator,
+    options: { headerShown: false },
   },
   Tasks: {
     name: "Tasks",
@@ -34,7 +41,7 @@ const routeMappings = {
     name: "Profile",
     tab: <UserCircle />,
     component: ProfileView,
-  },
+  }
 };
 
 // Navigation Tab
@@ -61,7 +68,7 @@ const App = () => {
         fallback={<ActivityIndicator color="blue" size="large" />}
         >
           <Tab.Navigator
-            initialRouteName="Home"
+            initialRouteName={home}
             backBehavior="order"
             screenOptions={({ route }) => ({
               tabBarIcon: () => routeMappings[route.name].tab
@@ -72,6 +79,7 @@ const App = () => {
                 key={routeMappings[r].name}
                 name={routeMappings[r].name}
                 component={routeMappings[r].component}
+                {...(routeMappings[r].options ?? {})}
               />
             ))}
           </Tab.Navigator>
