@@ -78,10 +78,10 @@ def recs_get_all_by_user_and_task(uid, tid):
   except:
     return util.error500("Internal server error")
 
-@app.route('/recommendations/homepage', methods=['GET'])
-def recs_get_homepage():
+@app.route('/recommendations/homepage/<email>', methods=['GET'])
+def recs_get_homepage(email):
   # try:
-  cursor.execute(f'SELECT * FROM recommendations r, tasks t WHERE r.chosen = True AND r.added_to_cal = False AND t.tid = r.tid')
+  cursor.execute(f'SELECT * FROM recommendations r, tasks t WHERE r.chosen = True AND r.added_to_cal = False AND t.tid = r.tid AND u.email = {email}')
   res = cursor.fetchall()
   for rec in res:
     rec['rid'] = str(rec['rid'])
