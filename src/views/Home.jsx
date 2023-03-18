@@ -195,17 +195,13 @@ const DateCard = props => {
       const responseCal = await backend.get(`/calendar/${currentUser.email}/${date}`);
       responseCalData = responseCal.data;
     } catch (error) {
-      console.log('calendar 1');
       console.error(error);
     }
     try {
       const responseRec = await backend.get(`/recommendations/homepage/${currentUser.id}`);
       const responseRecData = await responseRec.data;
-      console.log(date);
       responseRecFiltered = await responseRecData.filter(element => dateFilter(element, date));
-      console.log(responseRecFiltered);
     } catch (error) {
-      console.log('rec homepage1');
       console.error(error);
     }
     combinedEventData = await mergeCalendarEvents(responseCalData, responseRecFiltered);
@@ -323,7 +319,6 @@ const Home = () => {
     let responseCalData = [];
     let responseRecFiltered = [];
     try {
-      console.log(`/calendar/${currentUser.email}/${date}`);
       const responseCal = await backend.get(`/calendar/${currentUser.email}/${date}`);
       responseCalData = responseCal.data;
     } catch (error) {
