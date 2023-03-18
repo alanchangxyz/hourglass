@@ -199,7 +199,7 @@ const DateCard = props => {
       console.error(error);
     }
     try {
-      const responseRec = await backend.get(`/recommendations/homepage/${currentUser.email}`);
+      const responseRec = await backend.get(`/recommendations/homepage/${currentUser.id}`);
       const responseRecData = await responseRec.data;
       console.log(date);
       responseRecFiltered = await responseRecData.filter(element => dateFilter(element, date));
@@ -330,7 +330,7 @@ const Home = () => {
       console.error(error);
     }
     try {
-      const responseRec = await backend.get(`/recommendations/homepage/${currentUser.email}`);
+      const responseRec = await backend.get(`/recommendations/homepage/${currentUser.id}`);
       const responseRecData = responseRec.data;
       responseRecFiltered = responseRecData.filter(element => dateFilter(element, date));
     } catch (error) {
