@@ -85,12 +85,22 @@ const AddTaskView = ({ navigation, route }) => {
     try {
       taskDuration = Number(taskHours) * 60 + Number(taskMins);
 
-      const response = await backend.post('/tasks', {
-        uid: currentUser.id,
-        name: taskName,
-        duration: taskDuration
+      // const response = await backend.post('/tasks', {
+      //   uid: currentUser.id,
+      //   name: taskName,
+      //   duration: taskDuration
+      // });
+      const response = await fetch(`https://hourglass.alanchang.xyz/api/tasks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: currentUser.id,
+          name: taskName,
+          duration: taskDuration
+        })
       });
     } catch (error) {
+      console.log("post");
       console.error(error);
     }
 
