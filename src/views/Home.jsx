@@ -183,31 +183,33 @@ const DateCard = props => {
 
   async function onSelectDateCard() {
     // Update the DateCard that is highlighted
-    props.updateFocused();
+    if (currentUser.id) {
+      props.updateFocused();
 
-    date = props.date;
+      date = props.date;
 
-    // Get the homepage data
-    date = date.toLocaleDateString().replaceAll('/', '-');
-    let responseCalData = [];
-    let responseRecFiltered = [];
-    try {
-      const responseCal = await backend.get(`/calendar/${currentUser.email}/${date}`);
-      responseCalData = responseCal.data;
-    } catch (error) {
-      console.error(error);
+      // Get the homepage data
+      date = date.toLocaleDateString().replaceAll('/', '-');
+      let responseCalData = [];
+      let responseRecFiltered = [];
+      try {
+        const responseCal = await backend.get(`/calendar/${currentUser.email}/${date}`);
+        responseCalData = responseCal.data;
+      } catch (error) {
+        console.error(error);
+      }
+      try {
+        const responseRec = await backend.get(`/recommendations/homepage/${currentUser.id}`);
+        const responseRecData = await responseRec.data;
+        responseRecFiltered = await responseRecData.filter(element => dateFilter(element, date));
+      } catch (error) {
+        console.error(error);
+      }
+      combinedEventData = await mergeCalendarEvents(responseCalData, responseRecFiltered);
+
+      // Set the data from the calendar
+      props.setCalendarData(combinedEventData);
     }
-    try {
-      const responseRec = await backend.get(`/recommendations/homepage/${currentUser.id}`);
-      const responseRecData = await responseRec.data;
-      responseRecFiltered = await responseRecData.filter(element => dateFilter(element, date));
-    } catch (error) {
-      console.error(error);
-    }
-    combinedEventData = await mergeCalendarEvents(responseCalData, responseRecFiltered);
-
-    // Set the data from the calendar
-    props.setCalendarData(combinedEventData);
   }
   return (
     <TouchableWithoutFeedback onPress={() => onSelectDateCard()}>
