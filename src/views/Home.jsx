@@ -127,7 +127,12 @@ const styles = StyleSheet.create({
 function dateFilter(obj, date) {
   // recommendation should have a start date corresponding with the given date
   start_time = new Date(obj.start_time.substring(0, 17));
-  date_check = new Date(date);
+  dateArr = date.split('-');
+  day = dateArr[1];
+  month = dateArr[0];
+  year = dateArr[2];
+  date_check = new Date(Number(year), Number(month) - 1, Number(day));
+
   same_day =
     start_time.getFullYear() == date_check.getFullYear() &&
     start_time.getMonth() == date_check.getMonth() &&
@@ -190,13 +195,17 @@ const DateCard = props => {
       const responseCal = await backend.get(`/calendar/${currentUser.email}/${date}`);
       responseCalData = responseCal.data;
     } catch (error) {
+      console.log('calendar 1');
       console.error(error);
     }
     try {
-      const responseRec = await backend.get(`/recommendations/homepage`);
-      const responseRecData = responseRec.data;
-      responseRecFiltered = responseRecData.filter(element => dateFilter(element, date));
+      const responseRec = await backend.get(`/recommendations/homepage/${currentUser.id}`);
+      const responseRecData = await responseRec.data;
+      console.log(date);
+      responseRecFiltered = await responseRecData.filter(element => dateFilter(element, date));
+      console.log(responseRecFiltered);
     } catch (error) {
+      console.log('rec homepage1');
       console.error(error);
     }
     combinedEventData = await mergeCalendarEvents(responseCalData, responseRecFiltered);
@@ -321,7 +330,7 @@ const Home = () => {
       console.error(error);
     }
     try {
-      const responseRec = await backend.get(`/recommendations/homepage`);
+      const responseRec = await backend.get(`/recommendations/homepage/${currentUser.id}`);
       const responseRecData = responseRec.data;
       responseRecFiltered = responseRecData.filter(element => dateFilter(element, date));
     } catch (error) {

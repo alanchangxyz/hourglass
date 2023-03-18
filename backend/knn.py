@@ -146,7 +146,7 @@ def rankings_top_percent(rankings, percent):
     return [rankings[i] for i in range(num_recs)]
 
 
-def get_ranking(tid, start_date, end_date, email = "pkaramat@uci.edu"):
+def get_ranking(tid, start_date, end_date, email):
     date, start_range = start_date.split(" ")
     _, end_range = end_date.split(" ")
     unfiltered_rankings = get_unfiltered_ranking(tid, start_range, end_range)
