@@ -8,13 +8,14 @@ import {
     View,
     Button
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 import { useAuth } from '../util/Auth';
 import { useBackend } from '../util/Backend';
 
 const styles = StyleSheet.create({
     taskList: {
-        height: '100%',
+        minHeight: '100%',
         backgroundColor:'#FFFFFF',
         alignItems: 'center',
         paddingVertical: 15
@@ -56,15 +57,20 @@ const TasksView = ({navigation}) => {
   const { changeUser, currentUser } = useAuth();
 
   useEffect(() => {
-    getTaskData().then(data => setTaskData(data));
+    getTaskData();
+  }, [currentUser]);
+
+  useFocusEffect(() => {
+    getTaskData()
   });
 
   async function getTaskData() {
     try {
       const response = await backend.get(`/tasks/by-user/${currentUser.id}`);
-      const responseData = response.data;
-      return responseData;
+      // const response = await fetch(`https://hourglass.alanchang.xyz/api/tasks/by-user/${currentUser.id}`, { method: 'GET'});
+      setTaskData(response.data);
     } catch (error) {
+      console.log("get");
       console.error(error);
     }
   };
