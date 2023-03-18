@@ -12,7 +12,7 @@ import { useBackend } from '../util/Backend';
 import {styles, parseDate, parseTime} from '../utils/utils'
 
 const ScheduleTimeRangeView = ({navigation, route}) => {
-    const {tid} = route.params
+    const {tid, uid} = route.params
 
     const [timeRangeStart, setTimeRangeStart] = useState(new Date())
     const [timeRangeEnd, setTimeRangeEnd] = useState(new Date())
@@ -26,7 +26,7 @@ const ScheduleTimeRangeView = ({navigation, route}) => {
         var parsedTimeRangeEnd = parseTime(timeRangeEnd.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
         
         const res = await backend.get(`/recommendations/generate/${tid}/${parsedDate}/${parsedTimeRangeStart}/${parsedTimeRangeEnd}`);
-        const params = {date: timeRangeStart.toLocaleDateString("en-US", {timeZone: "America/Los_Angeles"}), rankedRecommendations: res.data, tid:tid}
+        const params = {date: timeRangeStart.toLocaleDateString("en-US", {timeZone: "America/Los_Angeles"}), rankedRecommendations: res.data, tid:tid, uid: uid}
         navigation.navigate('Choose a Time Slot', params)
     };
 

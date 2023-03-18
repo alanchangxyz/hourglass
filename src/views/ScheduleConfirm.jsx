@@ -14,10 +14,9 @@ import { useAuth } from '../util/Auth';
 
 const ScheduleConfirmView = ({navigation, route}) => {
 
-  const { currentUser } = useAuth();
   const { backend } = useBackend(); 
 
-  const {date, selectedStartTime, selectedEndTime, tid} = route.params
+  const {date, selectedStartTime, selectedEndTime, tid, uid} = route.params
 
   const confirmWithGCal = async () => {
     await postRecommendation(true);
@@ -37,7 +36,7 @@ const ScheduleConfirmView = ({navigation, route}) => {
   const postRecommendation = async ( added_to_cal) => {
     var data = 
     {
-        uid: currentUser.id, 
+        uid: uid 
         tid: tid, 
         added_to_cal: added_to_cal, 
         chosen: true, 

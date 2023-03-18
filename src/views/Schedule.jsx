@@ -4,6 +4,7 @@ import { SafeAreaView, ScrollView, StatusBar, Button } from 'react-native';
 import TaskCard from '../components/TaskCard';
 import { useBackend } from '../util/Backend';
 import { useAuth } from '../util/Auth';
+import { useFocusEffect } from '@react-navigation/native';
 
 const ScheduleView = ({ navigation }) => {
   const { backend } = useBackend();
@@ -19,7 +20,11 @@ const ScheduleView = ({ navigation }) => {
 
   useEffect(() => {
     getTasks();
-  }, []);
+  }, [currentUser]);
+
+  useFocusEffect(() => {
+    getTasks();
+  })
 
   return (
     <SafeAreaView>
@@ -29,7 +34,7 @@ const ScheduleView = ({ navigation }) => {
         title="Next"
         onPress={() => {
           if (selectedTask.name !== '') {
-            navigation.navigate('Choose a Time Range', selectedTask);
+            navigation.navigate('Choose a Time Range', {tid: selectedTask.time, name:selectedTask.name, duration: selectedTask.duration, uid: currentUser.id});
           }
         }}
       />

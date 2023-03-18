@@ -3,17 +3,15 @@ import { SafeAreaView, ScrollView, StatusBar, Text, View, Button } from 'react-n
 
 import { styles, convertMilitaryTime, parseDate } from '../utils/utils';
 import { useBackend } from '../util/Backend';
-import { useAuth } from '../util/Auth';
 import { ScheduleCard } from '../components/ScheduleCard';
 
 const SchedulePickTimeSlotView = ({ navigation, route }) => {
-  const { rankedRecommendations, tid, date } = route.params;
+  const { rankedRecommendations, tid, date, uid } = route.params;
 
   const [selectedTime, setSelectedTime] = useState(rankedRecommendations[0]);
 
   const [page, setPage] = useState(1);
 
-  const { currentUser } = useAuth();
   const { backend } = useBackend();
 
   const confirmation = async () => {
@@ -27,13 +25,14 @@ const SchedulePickTimeSlotView = ({ navigation, route }) => {
         selectedEndTime: selectedTime.endTime,
         tid: tid,
         date: date,
+        uid: uid
       });
     });
   };
 
   const postRecommendation = async rec => {
     var data = {
-      uid: currentUser.id,
+      uid: uid,
       tid: tid,
       added_to_cal: false,
       chosen: false,
