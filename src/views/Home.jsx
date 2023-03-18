@@ -312,31 +312,31 @@ const Home = () => {
   const { backend } = useBackend();
   const { changeUser, currentUser } = useAuth();
   useEffect(() => {
-    getHomepageCalDataHome(new Date()).then(data => setCalData(data));
+    if (currentUser.id != undefined) {
+      getHomepageCalDataHome(new Date()).then(data => setCalData(data));
+    }
   }, [currentUser]);
 
   async function getHomepageCalDataHome(date) {
-    if (currentUser.id) {
-      // Get the homepage data
-      date = date.toLocaleDateString().replaceAll('/', '-');
-      let responseCalData = [];
-      let responseRecFiltered = [];
-      try {
-        const responseCal = await backend.get(`/calendar/${currentUser.email}/${date}`);
-        responseCalData = responseCal.data;
-      } catch (error) {
-        console.error(error);
-      }
-      try {
-        const responseRec = await backend.get(`/recommendations/homepage/${currentUser.id}`);
-        const responseRecData = responseRec.data;
-        responseRecFiltered = responseRecData.filter(element => dateFilter(element, date));
-      } catch (error) {
-        console.error(error);
-      }
-      combinedEventData = await mergeCalendarEvents(responseCalData, responseRecFiltered);
-      return combinedEventData;
+    // Get the homepage data
+    date = date.toLocaleDateString().replaceAll('/', '-');
+    let responseCalData = [];
+    let responseRecFiltered = [];
+    try {
+      const responseCal = await backend.get(`/calendar/${currentUser.email}/${date}`);
+      responseCalData = responseCal.data;
+    } catch (error) {
+      console.error(error);
     }
+    try {
+      const responseRec = await backend.get(`/recommendations/homepage/${currentUser.id}`);
+      const responseRecData = responseRec.data;
+      responseRecFiltered = responseRecData.filter(element => dateFilter(element, date));
+    } catch (error) {
+      console.error(error);
+    }
+    combinedEventData = await mergeCalendarEvents(responseCalData, responseRecFiltered);
+    return combinedEventData;
   }
 
   function getEventTime(dateTime) {

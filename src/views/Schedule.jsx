@@ -24,7 +24,7 @@ const ScheduleView = ({ navigation }) => {
 
   useFocusEffect(() => {
     getTasks();
-  })
+  });
 
   return (
     <SafeAreaView>
@@ -34,7 +34,12 @@ const ScheduleView = ({ navigation }) => {
         title="Next"
         onPress={() => {
           if (selectedTask.name !== '') {
-            navigation.navigate('Choose a Time Range', {tid: selectedTask.time, name:selectedTask.name, duration: selectedTask.duration, uid: currentUser.id});
+            navigation.navigate('Choose a Time Range', {
+              tid: selectedTask.tid,
+              name: selectedTask.name,
+              duration: selectedTask.duration,
+              uid: currentUser.id,
+            });
           }
         }}
       />
