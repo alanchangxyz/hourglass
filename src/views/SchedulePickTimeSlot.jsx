@@ -25,7 +25,7 @@ const SchedulePickTimeSlotView = ({ navigation, route }) => {
         selectedEndTime: selectedTime.endTime,
         tid: tid,
         date: date,
-        uid: uid
+        uid: uid,
       });
     });
   };
@@ -46,6 +46,7 @@ const SchedulePickTimeSlotView = ({ navigation, route }) => {
       try {
         const response = await backend.post(`/recommendations`, data);
       } catch (error) {
+        console.log('ERRORED DATA' + JSON.stringify(data));
         console.error('error: ' + error);
       }
     }, 300);
@@ -80,8 +81,13 @@ const SchedulePickTimeSlotView = ({ navigation, route }) => {
           />
         </View>
 
-        {rankedRecommendations?.slice((page - 1) * 3, page * 3).map(rec => (
-          <ScheduleCard time={rec} selectedTime={selectedTime} setSelectedTime={setSelectedTime} />
+        {rankedRecommendations?.slice((page - 1) * 3, page * 3).map((rec, index) => (
+          <ScheduleCard
+            time={rec}
+            selectedTime={selectedTime}
+            setSelectedTime={setSelectedTime}
+            key={index}
+          />
         ))}
 
         <Button title="Confirm Time" onPress={confirmation} />

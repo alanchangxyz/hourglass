@@ -51,6 +51,7 @@ const ScheduleView = ({ navigation }) => {
             selectedTask={selectedTask}
             setSelectedTask={setSelectedTask}
             tid={task.tid}
+            key={task.tid}
           />
         ))}
       </ScrollView>
