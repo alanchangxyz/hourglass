@@ -32,6 +32,7 @@ const ScheduleConfirmView = ({navigation, route}) => {
 
   const addConfirmedTasktoGCal = () => {
     // TODO: add to gcal
+    console.log("Nice to have");
   }
 
   const postRecommendation = async ( added_to_cal) => {
