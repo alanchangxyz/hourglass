@@ -89,8 +89,8 @@ def recs_get_homepage(id):
     rec['tid'] = str(rec['tid'])
     rec['start_time'] = rec['start_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
     rec['end_time'] = rec['end_time'].strftime(f"%a, %d %b %Y %H:%M:%S PST")
-
-  return util.status200(res)
+  sorted_res = sorted(res, key = lambda rec: datetime.strptime(rec["start_time"], f"%a, %d %b %Y %H:%M:%S PST"))
+  return util.status200(sorted_res)
   # except:
   #   return util.error500("Internal server error")
 
