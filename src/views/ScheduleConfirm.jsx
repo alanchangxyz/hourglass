@@ -31,7 +31,6 @@ const ScheduleConfirmView = ({ navigation, route }) => {
       tid: tid,
       added_to_cal: added_to_cal,
       chosen: true,
-      min_offset: 0,
       start_time: `${parseDate(date, false)} ${selectedStartTime}`,
       end_time: `${parseDate(date, false)} ${selectedEndTime}`,
     };

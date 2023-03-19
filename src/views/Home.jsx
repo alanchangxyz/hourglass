@@ -152,7 +152,8 @@ function mergeCalendarEvents(googleCalendarEvents, scheduledEvents) {
   var sortedArr = [];
   while (i < googleCalendarEvents.length && j < scheduledEvents.length) {
     calTime = new Date(googleCalendarEvents[i].start.dateTime);
-    schedTime = new Date(scheduledEvents[j]['start_time']);
+    schedTime = new Date(scheduledEvents[j]['start_time'].replace(' PST', ''));
+
     if (calTime < schedTime) {
       sortedArr.push(googleCalendarEvents[i]);
       i++;

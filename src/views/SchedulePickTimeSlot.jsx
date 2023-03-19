@@ -36,7 +36,6 @@ const SchedulePickTimeSlotView = ({ navigation, route }) => {
       tid: tid,
       added_to_cal: false,
       chosen: false,
-      min_offset: 0,
       start_time: `${parseDate(date, false)} ${rec.startTime}`,
       end_time: `${parseDate(date, false)} ${rec.endTime}`,
     };
